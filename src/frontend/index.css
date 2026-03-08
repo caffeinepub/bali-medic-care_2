@@ -1,0 +1,181 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "Playfair Display";
+  src: url("/assets/fonts/PlayfairDisplay-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("/assets/fonts/PlusJakartaSans-Variable.woff2") format("woff2");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  :root {
+    --radius: 0.5rem;
+
+    /* ─── Bali Medic Care — Refined Teal & Warm White Palette ─── */
+
+    /* Page background: warm near-white with very faint teal tint */
+    --background: 0.97 0.008 210;
+    /* Main text: deep blue-slate — L=0.12 for strong contrast on white */
+    --foreground: 0.12 0.025 240;
+
+    /* Card: pure crisp white */
+    --card: 1 0 0;
+    --card-foreground: 0.12 0.025 240;
+
+    --popover: 1 0 0;
+    --popover-foreground: 0.12 0.025 240;
+
+    /* Primary: vivid teal — saturated enough to pop, dark enough for white text */
+    --primary: 0.42 0.12 205;
+    --primary-foreground: 0.99 0 0;
+
+    /* Secondary: light teal wash — used for secondary button bg */
+    --secondary: 0.93 0.02 205;
+    /* Secondary foreground: dark teal — clear on light-teal bg */
+    --secondary-foreground: 0.20 0.06 210;
+
+    /* Muted: very pale blue-gray bg for low-emphasis areas */
+    --muted: 0.93 0.012 215;
+    /* Muted text: medium slate — L=0.45 ensures readability, C=0.04 gives teal undertone */
+    --muted-foreground: 0.45 0.04 220;
+
+    /* Gold accent — kept warm for warmth against the cool teal */
+    --accent: 0.88 0.08 85;
+    --accent-foreground: 0.18 0.05 50;
+
+    --destructive: 0.577 0.245 27.325;
+    --destructive-foreground: 0.985 0 0;
+
+    /* Borders: slightly more visible for clear structure */
+    --border: 0.87 0.02 215;
+    --input: 0.87 0.02 215;
+    --ring: 0.42 0.12 205;
+
+    /* Charts: vivid, distinct, high-contrast set */
+    --chart-1: 0.52 0.14 205;
+    --chart-2: 0.62 0.16 160;
+    --chart-3: 0.72 0.12 85;
+    --chart-4: 0.48 0.11 265;
+    --chart-5: 0.60 0.15 30;
+
+    /* ─── Sidebar — Deep Teal ─── */
+    --sidebar: 0.20 0.065 218;
+    /* Sidebar text: bright white with subtle teal — high chroma so not washed out */
+    --sidebar-foreground: 0.96 0.018 210;
+    /* Sidebar primary: warm gold — brighter, more vibrant */
+    --sidebar-primary: 0.82 0.14 82;
+    --sidebar-primary-foreground: 0.14 0.05 50;
+    /* Sidebar active state: slightly lighter teal overlay */
+    --sidebar-accent: 0.30 0.08 215;
+    /* Sidebar accent text: crisp white */
+    --sidebar-accent-foreground: 0.97 0.012 210;
+    --sidebar-border: 0.28 0.06 218;
+    --sidebar-ring: 0.55 0.09 205;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: "Playfair Display", Georgia, serif;
+    color: oklch(var(--foreground));
+    letter-spacing: -0.01em;
+  }
+
+  /* Ensure links have clear color */
+  a {
+    color: oklch(var(--primary));
+  }
+
+  a:hover {
+    color: oklch(0.32 0.10 205);
+  }
+
+  /* Improve input legibility */
+  input, textarea, select {
+    color: oklch(var(--foreground));
+  }
+
+  input::placeholder, textarea::placeholder {
+    color: oklch(var(--muted-foreground));
+    opacity: 0.7;
+  }
+}
+
+@layer utilities {
+  /* Print utilities */
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+    .print-only {
+      display: block !important;
+    }
+    body {
+      background: white !important;
+      color: black !important;
+    }
+  }
+
+  @media screen {
+    .print-only {
+      display: none;
+    }
+  }
+}
+
+/* Sidebar decorative pattern — subtle diagonal grid over dark teal */
+.sidebar-pattern {
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      oklch(var(--sidebar-accent) / 0.6) 0px,
+      oklch(var(--sidebar-accent) / 0.6) 1px,
+      transparent 1px,
+      transparent 10px
+    );
+}
+
+/* Card hover elevation effect */
+.card-hover-lift {
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.card-hover-lift:hover {
+  box-shadow: 0 8px 24px 0 oklch(0.20 0.065 218 / 0.14), 0 2px 6px -1px oklch(0.20 0.065 218 / 0.10);
+  transform: translateY(-1px);
+}
+
+/* Print styles for invoice/letters */
+@media print {
+  @page {
+    margin: 1.5cm;
+    size: A4;
+  }
+
+  .print-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}
