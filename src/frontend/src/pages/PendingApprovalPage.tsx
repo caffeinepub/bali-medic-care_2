@@ -13,22 +13,22 @@ export default function PendingApprovalPage() {
           <Clock className="w-8 h-8 text-amber-600" />
         </div>
         <h2 className="font-display text-xl font-bold text-foreground mb-2">
-          Menunggu Persetujuan
+          Awaiting Approval
         </h2>
         <p className="text-sm text-muted-foreground mb-4">
-          Akun Anda sedang dalam proses verifikasi oleh administrator. Silahkan
-          hubungi admin untuk mendapatkan akses.
+          Your account is pending verification by the administrator. Please
+          contact admin to get access.
         </p>
         <div className="bg-muted rounded-lg p-3 mb-6 text-left">
           <p className="text-xs text-muted-foreground mb-1">
-            Principal ID Anda:
+            Your Principal ID:
           </p>
           <p className="text-xs font-mono text-foreground break-all">
             {principal}
           </p>
         </div>
         <p className="text-sm text-muted-foreground mb-4">
-          Hubungi:{" "}
+          Contact:{" "}
           <span className="font-medium text-foreground">+62 818-588-911</span>
         </p>
         <Button
@@ -38,7 +38,7 @@ export default function PendingApprovalPage() {
           className="gap-2"
         >
           <LogOut className="w-4 h-4" />
-          Keluar
+          Sign Out
         </Button>
       </div>
     </div>

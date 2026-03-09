@@ -39,10 +39,10 @@ export default function LoginPage() {
           <div className="px-8 py-8">
             <div className="text-center mb-6">
               <h2 className="font-display text-lg font-semibold text-foreground mb-1">
-                Selamat Datang
+                Welcome
               </h2>
               <p className="text-sm text-muted-foreground">
-                Silahkan masuk untuk mengakses sistem manajemen klinik
+                Sign in to access the clinic management system
               </p>
             </div>
 
@@ -55,12 +55,12 @@ export default function LoginPage() {
               {isLoggingIn ? (
                 <span className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Masuk...
+                  Signing in...
                 </span>
               ) : (
                 <span className="flex items-center gap-2">
                   <Shield className="w-4 h-4" />
-                  Masuk dengan Internet Identity
+                  Sign in with Internet Identity
                 </span>
               )}
             </Button>
@@ -68,7 +68,7 @@ export default function LoginPage() {
             <p className="text-center text-xs text-muted-foreground mt-4">
               Jl. Kartika Plaza, Kel. Tuban, Kec. Kuta
               <br />
-              Telp: +62 818-588-911
+              Phone: +62 818-588-911
             </p>
           </div>
         </div>

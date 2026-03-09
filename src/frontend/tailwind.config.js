@@ -78,8 +78,8 @@ export default {
       },
       boxShadow: {
         xs: "0 1px 2px 0 rgba(0,0,0,0.05)",
-        card: "0 1px 3px 0 rgba(0,40,60,0.08), 0 1px 2px -1px rgba(0,40,60,0.06)",
-        "card-hover": "0 4px 12px 0 rgba(0,40,60,0.12), 0 2px 4px -1px rgba(0,40,60,0.08)",
+        card: "0 1px 3px 0 rgba(0,30,90,0.08), 0 1px 2px -1px rgba(0,30,90,0.06)",
+        "card-hover": "0 4px 12px 0 rgba(0,30,90,0.12), 0 2px 4px -1px rgba(0,30,90,0.08)",
       },
       keyframes: {
         "accordion-down": {

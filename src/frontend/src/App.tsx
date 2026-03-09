@@ -52,7 +52,7 @@ export default function App() {
         <div className="flex flex-col items-center gap-3">
           <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
           <p className="text-muted-foreground text-sm font-sans">
-            Memuat sistem...
+            Loading system...
           </p>
         </div>
       </div>
@@ -74,7 +74,7 @@ export default function App() {
         <div className="flex flex-col items-center gap-3">
           <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
           <p className="text-muted-foreground text-sm font-sans">
-            Memverifikasi akses...
+            Verifying access...
           </p>
         </div>
       </div>

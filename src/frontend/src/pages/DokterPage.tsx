@@ -64,20 +64,20 @@ export default function DokterPage() {
 
   const handleSubmit = async () => {
     if (!form.name) {
-      toast.error("Nama dokter wajib diisi");
+      toast.error("Doctor name is required");
       return;
     }
     try {
       if (editDoctor) {
         await updateMutation.mutateAsync({ id: editDoctor.id, ...form });
-        toast.success("Data dokter diperbarui");
+        toast.success("Doctor updated");
       } else {
         await createMutation.mutateAsync(form);
-        toast.success("Dokter baru ditambahkan");
+        toast.success("New doctor added");
       }
       setFormOpen(false);
     } catch {
-      toast.error("Gagal menyimpan data dokter");
+      toast.error("Failed to save doctor");
     }
   };
 
@@ -85,10 +85,10 @@ export default function DokterPage() {
     if (!deleteId) return;
     try {
       await deleteMutation.mutateAsync(deleteId);
-      toast.success("Dokter dihapus");
+      toast.success("Doctor deleted");
       setDeleteId(null);
     } catch {
-      toast.error("Gagal menghapus dokter");
+      toast.error("Failed to delete doctor");
     }
   };
 
@@ -99,10 +99,10 @@ export default function DokterPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display text-2xl font-bold text-foreground">
-            Dokter
+            Doctors
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Kelola data dokter klinik
+            Manage clinic doctor records
           </p>
         </div>
         <Button
@@ -111,7 +111,7 @@ export default function DokterPage() {
           className="gap-2"
         >
           <Plus className="w-4 h-4" />
-          Tambah Dokter
+          Add Doctor
         </Button>
       </div>
 
@@ -129,7 +129,7 @@ export default function DokterPage() {
               className="text-center py-12 text-muted-foreground"
             >
               <Stethoscope className="w-10 h-10 mx-auto mb-3 opacity-30" />
-              <p className="text-sm">Belum ada data dokter</p>
+              <p className="text-sm">No doctor records yet</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -137,16 +137,16 @@ export default function DokterPage() {
                 <thead>
                   <tr className="border-b border-border bg-muted/30">
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                      Nama
+                      Name
                     </th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide hidden sm:table-cell">
-                      Spesialisasi
+                      Specialization
                     </th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide hidden md:table-cell">
-                      Telepon
+                      Phone
                     </th>
                     <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                      Aksi
+                      Actions
                     </th>
                   </tr>
                 </thead>
@@ -200,12 +200,12 @@ export default function DokterPage() {
         <DialogContent className="sm:max-w-md" data-ocid="dokter.dialog">
           <DialogHeader>
             <DialogTitle className="font-display">
-              {editDoctor ? "Edit Data Dokter" : "Tambah Dokter Baru"}
+              {editDoctor ? "Edit Doctor" : "Add New Doctor"}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div>
-              <Label htmlFor="d-name">Nama Dokter *</Label>
+              <Label htmlFor="d-name">Doctor Name *</Label>
               <Input
                 id="d-name"
                 data-ocid="dokter.input"
@@ -213,12 +213,12 @@ export default function DokterPage() {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, name: e.target.value }))
                 }
-                placeholder="Nama lengkap"
+                placeholder="Full name"
                 className="mt-1"
               />
             </div>
             <div>
-              <Label htmlFor="d-spec">Spesialisasi</Label>
+              <Label htmlFor="d-spec">Specialization</Label>
               <Input
                 id="d-spec"
                 data-ocid="dokter.specialization.input"
@@ -226,12 +226,12 @@ export default function DokterPage() {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, specialization: e.target.value }))
                 }
-                placeholder="Misal: Dokter Umum"
+                placeholder="e.g. General Practitioner"
                 className="mt-1"
               />
             </div>
             <div>
-              <Label htmlFor="d-phone">Telepon</Label>
+              <Label htmlFor="d-phone">Phone</Label>
               <Input
                 id="d-phone"
                 data-ocid="dokter.phone.input"
@@ -239,7 +239,7 @@ export default function DokterPage() {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, phone: e.target.value }))
                 }
-                placeholder="Nomor telepon"
+                placeholder="Phone number"
                 className="mt-1"
               />
             </div>
@@ -250,14 +250,14 @@ export default function DokterPage() {
               variant="outline"
               onClick={() => setFormOpen(false)}
             >
-              Batal
+              Cancel
             </Button>
             <Button
               data-ocid="dokter.submit_button"
               onClick={handleSubmit}
               disabled={isPending}
             >
-              {isPending ? "Menyimpan..." : editDoctor ? "Simpan" : "Tambah"}
+              {isPending ? "Saving..." : editDoctor ? "Save" : "Add"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -267,21 +267,21 @@ export default function DokterPage() {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent data-ocid="dokter.delete.dialog">
           <AlertDialogHeader>
-            <AlertDialogTitle>Hapus Data Dokter?</AlertDialogTitle>
+            <AlertDialogTitle>Delete Doctor?</AlertDialogTitle>
             <AlertDialogDescription>
-              Data dokter akan dihapus permanen.
+              The doctor record will be permanently deleted.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel data-ocid="dokter.cancel_button">
-              Batal
+              Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               data-ocid="dokter.confirm_button"
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Hapus
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

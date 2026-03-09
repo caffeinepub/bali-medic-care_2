@@ -27,13 +27,13 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { id: "pasien", label: "Pasien", icon: Users },
-  { id: "dokter", label: "Dokter", icon: Stethoscope },
+  { id: "pasien", label: "Patients", icon: Users },
+  { id: "dokter", label: "Doctors", icon: Stethoscope },
   { id: "invoice", label: "Invoice", icon: FileText },
-  { id: "surat-sakit", label: "Surat Keterangan Sakit", icon: Cross },
-  { id: "surat-sehat", label: "Surat Keterangan Sehat", icon: Heart },
-  { id: "katalog", label: "Katalog Layanan", icon: BookOpen },
-  { id: "pengaturan", label: "Pengaturan", icon: Settings },
+  { id: "surat-sakit", label: "Sick Note", icon: Cross },
+  { id: "surat-sehat", label: "Health Certificate", icon: Heart },
+  { id: "katalog", label: "Service Catalog", icon: BookOpen },
+  { id: "pengaturan", label: "Settings", icon: Settings },
 ];
 
 interface AppLayoutProps {
@@ -73,13 +73,11 @@ export default function AppLayout({
             <div className="w-8 h-8 rounded-lg bg-sidebar-primary flex items-center justify-center">
               <Stethoscope className="w-4 h-4 text-sidebar-primary-foreground" />
             </div>
-            <span className="text-sidebar-foreground font-display font-bold text-sm tracking-wide">
+            <span className="text-white font-display font-bold text-sm tracking-wide">
               Bali Medic Care
             </span>
           </div>
-          <p className="text-xs text-sidebar-foreground/60 pl-10">
-            dr. Romy Kamaluddin
-          </p>
+          <p className="text-xs text-white/70 pl-10">dr. Romy Kamaluddin</p>
         </div>
       </div>
 
@@ -99,8 +97,8 @@ export default function AppLayout({
               className={cn(
                 "w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-all duration-150",
                 isActive
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                  : "text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
+                  ? "bg-sidebar-accent text-white"
+                  : "text-white hover:bg-sidebar-accent/60 hover:text-white",
               )}
             >
               <Icon className="w-4 h-4 shrink-0" />
@@ -118,8 +116,8 @@ export default function AppLayout({
       {/* Footer */}
       <div className="px-3 pb-4 border-t border-sidebar-border pt-4 space-y-3">
         <div className="px-3 py-2 rounded-md bg-sidebar-accent/40">
-          <p className="text-xs text-sidebar-foreground/50 mb-0.5">Principal</p>
-          <p className="text-xs text-sidebar-foreground/80 font-mono truncate">
+          <p className="text-xs text-white/70 mb-0.5">Principal</p>
+          <p className="text-xs text-white font-mono truncate">
             {shortPrincipal}
           </p>
           {userRole === "admin" && (
@@ -134,10 +132,10 @@ export default function AppLayout({
           size="sm"
           data-ocid="nav.logout.button"
           onClick={clear}
-          className="w-full justify-start gap-2 text-sidebar-foreground/70 hover:text-destructive hover:bg-destructive/10"
+          className="w-full justify-start gap-2 text-white hover:text-destructive hover:bg-destructive/10"
         >
           <LogOut className="w-4 h-4" />
-          Keluar
+          Sign Out
         </Button>
       </div>
     </div>
@@ -161,7 +159,7 @@ export default function AppLayout({
           <aside className="relative z-10 w-72 flex flex-col bg-sidebar h-full">
             <button
               type="button"
-              className="absolute top-4 right-4 text-sidebar-foreground/70 hover:text-sidebar-foreground"
+              className="absolute top-4 right-4 text-white/70 hover:text-white"
               onClick={closeMobile}
             >
               <X className="w-5 h-5" />

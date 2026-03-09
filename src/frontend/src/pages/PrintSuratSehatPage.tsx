@@ -21,7 +21,7 @@ export default function PrintSuratSehatPage({ certId, onBack }: Props) {
   const { data: certs } = useGetHealthCertificates();
   const { data: patients } = useGetPatients();
   const { data: doctors } = useGetDoctors();
-  const { signature, stamp } = useClinicSettings();
+  const { signature, stamp, logo } = useClinicSettings();
 
   const cert = certs?.find((c) => c.id === certId);
   const patient = cert ? patients?.find((p) => p.id === cert.patientId) : null;
@@ -30,9 +30,9 @@ export default function PrintSuratSehatPage({ certId, onBack }: Props) {
   if (!cert || !patient || !doctor) {
     return (
       <div className="p-8 text-center text-muted-foreground">
-        <p>Surat tidak ditemukan.</p>
+        <p>Document not found.</p>
         <Button variant="outline" onClick={onBack} className="mt-4">
-          Kembali
+          Back
         </Button>
       </div>
     );
@@ -49,7 +49,7 @@ export default function PrintSuratSehatPage({ certId, onBack }: Props) {
           className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="w-4 h-4" />
-          Kembali
+          Back
         </button>
         <Button
           data-ocid="print-surat-sehat.button"
@@ -57,87 +57,106 @@ export default function PrintSuratSehatPage({ certId, onBack }: Props) {
           className="gap-2"
         >
           <Printer className="w-4 h-4" />
-          Cetak Surat
+          Print Document
         </Button>
       </div>
 
-      {/* Letter document */}
-      <div className="print-container max-w-2xl mx-auto my-8 bg-white shadow-lg p-12 print:shadow-none print:my-0">
+      {/* Letter document — A4 width */}
+      <div className="print-container max-w-[794px] mx-auto my-8 bg-white shadow-lg px-12 py-10 print:shadow-none print:my-0 print:px-0 print:py-0">
         {/* Kop Surat */}
-        <div className="text-center border-b-4 border-double border-gray-800 pb-4 mb-8">
-          <h1 className="font-display text-xl font-bold text-gray-900 uppercase tracking-wider">
-            {CLINIC_NAME}
-          </h1>
-          <p className="text-sm text-gray-600 mt-1">{CLINIC_ADDRESS}</p>
-          <p className="text-sm text-gray-600">Telp: {CLINIC_PHONE}</p>
+        <div className="border-b-4 border-double border-gray-800 pb-4 mb-8">
+          {logo ? (
+            <div className="flex items-center gap-4">
+              <img
+                src={logo}
+                alt="Clinic Logo"
+                className="max-h-16 max-w-[100px] object-contain"
+              />
+              <div>
+                <h1 className="font-display text-xl font-bold text-gray-900 uppercase tracking-wider">
+                  {CLINIC_NAME}
+                </h1>
+                <p className="text-sm text-gray-600 mt-1">{CLINIC_ADDRESS}</p>
+                <p className="text-sm text-gray-600">Telp: {CLINIC_PHONE}</p>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center">
+              <h1 className="font-display text-xl font-bold text-gray-900 uppercase tracking-wider">
+                {CLINIC_NAME}
+              </h1>
+              <p className="text-sm text-gray-600 mt-1">{CLINIC_ADDRESS}</p>
+              <p className="text-sm text-gray-600">Telp: {CLINIC_PHONE}</p>
+            </div>
+          )}
         </div>
 
         {/* Title */}
         <div className="text-center mb-8">
           <h2 className="font-display text-lg font-bold uppercase tracking-widest text-gray-800 underline underline-offset-4">
-            SURAT KETERANGAN SEHAT
+            HEALTH CERTIFICATE
           </h2>
         </div>
 
         {/* Body */}
         <div className="text-sm text-gray-800 leading-relaxed space-y-4">
-          <p>Yang bertanda tangan di bawah ini:</p>
+          <p>The undersigned below:</p>
 
           <div className="grid grid-cols-[180px_1fr] gap-y-1.5 ml-4">
-            <span>Nama</span>
+            <span>Name</span>
             <span>: {doctor.name}</span>
-            <span>Spesialisasi</span>
-            <span>: {doctor.specialization || "Dokter Umum"}</span>
-            <span>Tempat Praktik</span>
+            <span>Specialization</span>
+            <span>: {doctor.specialization || "General Practitioner"}</span>
+            <span>Practice Location</span>
             <span>: {CLINIC_NAME}</span>
           </div>
 
-          <p className="mt-4">Menerangkan dengan sebenarnya bahwa:</p>
+          <p className="mt-4">Hereby truthfully certifies that:</p>
 
           <div className="grid grid-cols-[180px_1fr] gap-y-1.5 ml-4">
-            <span>Nama Pasien</span>
+            <span>Patient Name</span>
             <span>
               : <strong>{patient.name}</strong>
             </span>
-            <span>No. Pasien</span>
+            <span>Patient No.</span>
             <span>: {patient.patientNo}</span>
-            <span>Jenis Kelamin</span>
+            <span>Gender</span>
             <span>
               :{" "}
               {patient.gender === "male"
-                ? "Laki-laki"
+                ? "Male"
                 : patient.gender === "female"
-                  ? "Perempuan"
-                  : "Lainnya"}
+                  ? "Female"
+                  : "Other"}
             </span>
-            <span>Alamat</span>
+            <span>Address</span>
             <span>: {patient.address || "–"}</span>
           </div>
 
           {/* Physical Examination Results */}
           <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
             <p className="font-semibold text-gray-800 mb-3">
-              Hasil Pemeriksaan Fisik:
+              Physical Examination Results:
             </p>
             <div className="grid grid-cols-2 gap-y-2 text-sm">
               <div>
-                <span className="text-gray-500">Tekanan Darah</span>
+                <span className="text-gray-500">Blood Pressure</span>
                 <p className="font-medium">{cert.bloodPressure || "–"}</p>
               </div>
               <div>
-                <span className="text-gray-500">Denyut Nadi</span>
+                <span className="text-gray-500">Pulse</span>
                 <p className="font-medium">
                   {cert.pulse ? `${String(cert.pulse)} bpm` : "–"}
                 </p>
               </div>
               <div>
-                <span className="text-gray-500">Berat Badan</span>
+                <span className="text-gray-500">Weight</span>
                 <p className="font-medium">
                   {cert.weight ? `${String(cert.weight)} kg` : "–"}
                 </p>
               </div>
               <div>
-                <span className="text-gray-500">Tinggi Badan</span>
+                <span className="text-gray-500">Height</span>
                 <p className="font-medium">
                   {cert.height ? `${String(cert.height)} cm` : "–"}
                 </p>
@@ -146,9 +165,9 @@ export default function PrintSuratSehatPage({ certId, onBack }: Props) {
           </div>
 
           <p>
-            Berdasarkan pemeriksaan yang telah dilakukan, yang bersangkutan
-            dalam <strong>keadaan sehat jasmani dan rohani</strong> dan
-            dinyatakan <strong>layak</strong> untuk keperluan:{" "}
+            Based on the examination conducted, the above-mentioned individual
+            is in <strong>good physical and mental health</strong> and is
+            declared <strong>fit</strong> for the purpose of:{" "}
             <strong>{cert.purpose}</strong>.
           </p>
 
@@ -159,45 +178,49 @@ export default function PrintSuratSehatPage({ certId, onBack }: Props) {
           )}
 
           <p>
-            Demikian surat keterangan ini dibuat dengan sebenarnya dan dapat
-            dipergunakan sebagaimana mestinya.
+            This certificate is issued truthfully and may be used as required.
           </p>
         </div>
 
-        {/* Signature */}
-        <div className="mt-10 flex justify-end">
-          <div className="text-center relative">
+        {/* Signature — BOTTOM LEFT: merged signature + stamp */}
+        <div className="mt-10 flex justify-start">
+          <div className="text-center">
             <p className="text-sm text-gray-700">
               Kuta, Bali, {formatDateLong(cert.issuedDate)}
             </p>
-            <p className="text-sm text-gray-700 mt-1">Dokter Pemeriksa,</p>
-            <div className="h-16 flex items-center justify-center relative">
+            <p className="text-sm text-gray-700 mt-1">Examining Doctor,</p>
+
+            {/* Merged signature + stamp overlay */}
+            <div className="relative inline-flex items-center justify-center mt-2 h-24 w-56">
               {signature && (
                 <img
                   src={signature}
-                  alt="Tanda tangan"
-                  className="max-h-14 max-w-[160px] object-contain"
+                  alt="Signature"
+                  className="absolute inset-0 w-full h-full object-contain z-10"
                 />
               )}
               {stamp && (
                 <img
                   src={stamp}
-                  alt="Cap klinik"
-                  className="absolute -right-8 -top-2 max-h-16 max-w-[80px] object-contain opacity-70"
+                  alt="Clinic stamp"
+                  className="absolute inset-0 w-full h-full object-contain opacity-80 z-20"
                 />
               )}
             </div>
-            <p className="text-sm font-semibold text-gray-900">{doctor.name}</p>
+
+            <p className="text-sm font-semibold text-gray-900 mt-1">
+              {doctor.name}
+            </p>
             <p className="text-xs text-gray-500">
-              {doctor.specialization || "Dokter Umum"}
+              {doctor.specialization || "General Practitioner"}
             </p>
           </div>
         </div>
 
-        {/* No. Surat */}
+        {/* Doc Number */}
         <div className="mt-6 text-xs text-gray-400 border-t border-gray-100 pt-3">
           <p>
-            No. Surat: SKSeh/{formatDate(cert.issuedDate).replace(/-/g, "")}/{" "}
+            Doc No.: SKSeh/{formatDate(cert.issuedDate).replace(/-/g, "")}/{" "}
             {String(cert.id)}
           </p>
         </div>

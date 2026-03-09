@@ -100,7 +100,7 @@ export default function PasienPage() {
 
   const handleSubmit = async () => {
     if (!form.name || !form.dateOfBirth) {
-      toast.error("Nama dan tanggal lahir wajib diisi");
+      toast.error("Name and date of birth are required");
       return;
     }
     const genderEnum =
@@ -119,7 +119,7 @@ export default function PasienPage() {
           address: form.address,
           phone: form.phone,
         });
-        toast.success("Data pasien diperbarui");
+        toast.success("Patient updated");
       } else {
         await createMutation.mutateAsync({
           name: form.name,
@@ -128,11 +128,11 @@ export default function PasienPage() {
           address: form.address,
           phone: form.phone,
         });
-        toast.success("Pasien baru ditambahkan");
+        toast.success("New patient added");
       }
       setFormOpen(false);
     } catch {
-      toast.error("Gagal menyimpan data pasien");
+      toast.error("Failed to save patient");
     }
   };
 
@@ -140,10 +140,10 @@ export default function PasienPage() {
     if (!deleteId) return;
     try {
       await deleteMutation.mutateAsync(deleteId);
-      toast.success("Pasien dihapus");
+      toast.success("Patient deleted");
       setDeleteId(null);
     } catch {
-      toast.error("Gagal menghapus pasien");
+      toast.error("Failed to delete patient");
     }
   };
 
@@ -154,10 +154,10 @@ export default function PasienPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display text-2xl font-bold text-foreground">
-            Pasien
+            Patients
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Kelola data pasien klinik
+            Manage clinic patient records
           </p>
         </div>
         <Button
@@ -166,7 +166,7 @@ export default function PasienPage() {
           className="gap-2"
         >
           <Plus className="w-4 h-4" />
-          Tambah Pasien
+          Add Patient
         </Button>
       </div>
 
@@ -175,7 +175,7 @@ export default function PasienPage() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           data-ocid="pasien.search_input"
-          placeholder="Cari nama, nomor pasien, atau telepon..."
+          placeholder="Search by name, patient number, or phone..."
           className="pl-9"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -206,7 +206,7 @@ export default function PasienPage() {
               className="text-center py-12 text-muted-foreground"
             >
               <p className="text-sm">
-                {search ? "Pasien tidak ditemukan" : "Belum ada data pasien"}
+                {search ? "No patients found" : "No patient records yet"}
               </p>
             </div>
           ) : (
@@ -215,22 +215,22 @@ export default function PasienPage() {
                 <thead>
                   <tr className="border-b border-border bg-muted/30">
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                      No. Pasien
+                      Patient No.
                     </th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                      Nama
+                      Name
                     </th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide hidden md:table-cell">
-                      Tgl Lahir
+                      Date of Birth
                     </th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide hidden sm:table-cell">
-                      Jenis Kelamin
+                      Gender
                     </th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide hidden lg:table-cell">
-                      Telepon
+                      Phone
                     </th>
                     <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                      Aksi
+                      Actions
                     </th>
                   </tr>
                 </thead>
@@ -258,10 +258,10 @@ export default function PasienPage() {
                           className="text-xs"
                         >
                           {p.gender === "male"
-                            ? "Laki-laki"
+                            ? "Male"
                             : p.gender === "female"
-                              ? "Perempuan"
-                              : "Lainnya"}
+                              ? "Female"
+                              : "Other"}
                         </Badge>
                       </td>
                       <td className="px-4 py-3 text-muted-foreground hidden lg:table-cell">
@@ -303,12 +303,12 @@ export default function PasienPage() {
         <DialogContent className="sm:max-w-md" data-ocid="pasien.dialog">
           <DialogHeader>
             <DialogTitle className="font-display">
-              {editPatient ? "Edit Data Pasien" : "Tambah Pasien Baru"}
+              {editPatient ? "Edit Patient" : "Add New Patient"}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div>
-              <Label htmlFor="name">Nama Lengkap *</Label>
+              <Label htmlFor="name">Full Name *</Label>
               <Input
                 id="name"
                 data-ocid="pasien.input"
@@ -316,12 +316,12 @@ export default function PasienPage() {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, name: e.target.value }))
                 }
-                placeholder="Nama lengkap pasien"
+                placeholder="Patient's full name"
                 className="mt-1"
               />
             </div>
             <div>
-              <Label htmlFor="dob">Tanggal Lahir *</Label>
+              <Label htmlFor="dob">Date of Birth *</Label>
               <Input
                 id="dob"
                 type="date"
@@ -334,7 +334,7 @@ export default function PasienPage() {
               />
             </div>
             <div>
-              <Label>Jenis Kelamin</Label>
+              <Label>Gender</Label>
               <Select
                 value={form.gender}
                 onValueChange={(v) =>
@@ -351,14 +351,14 @@ export default function PasienPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="male">Laki-laki</SelectItem>
-                  <SelectItem value="female">Perempuan</SelectItem>
-                  <SelectItem value="other">Lainnya</SelectItem>
+                  <SelectItem value="male">Male</SelectItem>
+                  <SelectItem value="female">Female</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label htmlFor="address">Alamat</Label>
+              <Label htmlFor="address">Address</Label>
               <Input
                 id="address"
                 data-ocid="pasien.address.input"
@@ -366,12 +366,12 @@ export default function PasienPage() {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, address: e.target.value }))
                 }
-                placeholder="Alamat lengkap"
+                placeholder="Full address"
                 className="mt-1"
               />
             </div>
             <div>
-              <Label htmlFor="phone">Telepon</Label>
+              <Label htmlFor="phone">Phone</Label>
               <Input
                 id="phone"
                 data-ocid="pasien.phone.input"
@@ -379,7 +379,7 @@ export default function PasienPage() {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, phone: e.target.value }))
                 }
-                placeholder="Nomor telepon"
+                placeholder="Phone number"
                 className="mt-1"
               />
             </div>
@@ -390,7 +390,7 @@ export default function PasienPage() {
               variant="outline"
               onClick={() => setFormOpen(false)}
             >
-              Batal
+              Cancel
             </Button>
             <Button
               data-ocid="pasien.submit_button"
@@ -398,10 +398,10 @@ export default function PasienPage() {
               disabled={isPending}
             >
               {isPending
-                ? "Menyimpan..."
+                ? "Saving..."
                 : editPatient
-                  ? "Simpan Perubahan"
-                  : "Tambah Pasien"}
+                  ? "Save Changes"
+                  : "Add Patient"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -411,22 +411,22 @@ export default function PasienPage() {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent data-ocid="pasien.delete.dialog">
           <AlertDialogHeader>
-            <AlertDialogTitle>Hapus Data Pasien?</AlertDialogTitle>
+            <AlertDialogTitle>Delete Patient?</AlertDialogTitle>
             <AlertDialogDescription>
-              Tindakan ini tidak dapat dibatalkan. Data pasien akan dihapus
-              permanen.
+              This action cannot be undone. The patient record will be
+              permanently deleted.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel data-ocid="pasien.cancel_button">
-              Batal
+              Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               data-ocid="pasien.confirm_button"
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Hapus
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

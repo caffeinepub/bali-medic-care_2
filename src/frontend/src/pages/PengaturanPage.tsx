@@ -1,6 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2, Stamp, Trash2, Upload, UserPen } from "lucide-react";
+import {
+  CheckCircle2,
+  ImageIcon,
+  Stamp,
+  Trash2,
+  Upload,
+  UserPen,
+} from "lucide-react";
 import { motion } from "motion/react";
 import { useCallback, useRef } from "react";
 import { toast } from "sonner";
@@ -10,7 +17,7 @@ function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result as string);
-    reader.onerror = () => reject(new Error("Gagal membaca file"));
+    reader.onerror = () => reject(new Error("Failed to read file"));
     reader.readAsDataURL(file);
   });
 }
@@ -25,6 +32,7 @@ interface UploadAreaProps {
   uploadOcid: string;
   dropzoneOcid: string;
   deleteOcid: string;
+  previewBg?: string;
 }
 
 function UploadArea({
@@ -37,25 +45,26 @@ function UploadArea({
   uploadOcid,
   dropzoneOcid,
   deleteOcid,
+  previewBg = "bg-white",
 }: UploadAreaProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = useCallback(
     async (file: File) => {
       if (!file.type.startsWith("image/")) {
-        toast.error("File harus berupa gambar (PNG, JPG, dll.)");
+        toast.error("File must be an image (PNG, JPG, etc.)");
         return;
       }
       if (file.size > 5 * 1024 * 1024) {
-        toast.error("Ukuran file terlalu besar (maksimal 5MB)");
+        toast.error("File size too large (max 5MB)");
         return;
       }
       try {
         const dataUrl = await fileToBase64(file);
         onUpload(dataUrl);
-        toast.success(`${label} berhasil disimpan`);
+        toast.success(`${label} saved successfully`);
       } catch {
-        toast.error(`Gagal menyimpan ${label.toLowerCase()}`);
+        toast.error(`Failed to save ${label.toLowerCase()}`);
       }
     },
     [label, onUpload],
@@ -66,7 +75,6 @@ function UploadArea({
       const file = e.target.files?.[0];
       if (file) {
         handleFile(file);
-        // Reset input so same file can be re-uploaded
         e.target.value = "";
       }
     },
@@ -120,8 +128,9 @@ function UploadArea({
 
           {value ? (
             <div className="flex flex-col items-center gap-3">
-              {/* Preview */}
-              <div className="bg-white border border-border rounded-lg p-3 shadow-sm inline-block">
+              <div
+                className={`border border-border rounded-lg p-3 shadow-sm inline-block ${previewBg}`}
+              >
                 <img
                   src={value}
                   alt={label}
@@ -130,18 +139,16 @@ function UploadArea({
               </div>
               <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
                 <CheckCircle2 className="w-3.5 h-3.5" />
-                Tersimpan — klik untuk ganti
+                Saved — click to replace
               </div>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-2 text-muted-foreground">
               <Upload className="w-8 h-8 opacity-40 group-hover:opacity-60 transition-opacity" />
               <div>
-                <p className="text-sm font-medium">
-                  Klik atau seret file ke sini
-                </p>
+                <p className="text-sm font-medium">Click or drag file here</p>
                 <p className="text-xs mt-0.5 opacity-70">
-                  PNG, JPG, WebP · Maks. 5MB
+                  PNG, JPG, WebP · Max. 5MB
                 </p>
               </div>
             </div>
@@ -162,12 +169,12 @@ function UploadArea({
               data-ocid={deleteOcid}
               onClick={() => {
                 onClear();
-                toast.success(`${label} dihapus`);
+                toast.success(`${label} removed`);
               }}
               className="w-full gap-2 text-destructive border-destructive/30 hover:bg-destructive/10 hover:border-destructive/60"
             >
               <Trash2 className="w-3.5 h-3.5" />
-              Hapus {label}
+              Remove {label}
             </Button>
           </motion.div>
         )}
@@ -180,10 +187,13 @@ export default function PengaturanPage() {
   const {
     signature,
     stamp,
+    logo,
     setSignature,
     setStamp,
+    setLogo,
     clearSignature,
     clearStamp,
+    clearLogo,
   } = useClinicSettings();
 
   return (
@@ -191,11 +201,11 @@ export default function PengaturanPage() {
       {/* Page header */}
       <div>
         <h1 className="font-display text-2xl font-bold text-foreground">
-          Pengaturan Klinik
+          Clinic Settings
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Kelola tanda tangan digital dan cap resmi klinik yang akan muncul di
-          semua dokumen cetak.
+          Manage the clinic logo, digital signature, and official stamp that
+          will appear on all printed documents.
         </p>
       </div>
 
@@ -203,41 +213,67 @@ export default function PengaturanPage() {
       <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-primary/80 flex items-start gap-2.5">
         <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0 text-primary" />
         <p>
-          Tanda tangan dan cap disimpan di perangkat ini secara lokal. Gambar
-          akan otomatis tampil di Invoice, Surat Keterangan Sakit, dan Surat
-          Keterangan Sehat saat dicetak.
+          All images are stored locally on this device and will automatically
+          appear on Invoice, Sick Note, and Health Certificate when printed.
         </p>
       </div>
 
-      {/* Upload sections */}
-      <div className="grid gap-5 sm:grid-cols-2">
+      {/* Logo section */}
+      <div>
+        <h2 className="text-sm font-semibold text-foreground mb-3 uppercase tracking-wider">
+          Clinic Identity
+        </h2>
         <UploadArea
-          label="Tanda Tangan Digital"
-          description="Upload gambar tanda tangan dokter (PNG transparan direkomendasikan)"
-          icon={<UserPen className="w-4 h-4" />}
-          value={signature}
-          onUpload={setSignature}
-          onClear={clearSignature}
-          uploadOcid="pengaturan.signature.upload_button"
-          dropzoneOcid="pengaturan.signature.dropzone"
-          deleteOcid="pengaturan.signature.delete_button"
-        />
-
-        <UploadArea
-          label="Cap / Stempel Klinik"
-          description="Upload gambar cap atau stempel resmi klinik (PNG transparan direkomendasikan)"
-          icon={<Stamp className="w-4 h-4" />}
-          value={stamp}
-          onUpload={setStamp}
-          onClear={clearStamp}
-          uploadOcid="pengaturan.stamp.upload_button"
-          dropzoneOcid="pengaturan.stamp.dropzone"
-          deleteOcid="pengaturan.stamp.delete_button"
+          label="Clinic Logo"
+          description="Upload the clinic logo to appear in the header of all printed documents (transparent PNG recommended, max width 300px)"
+          icon={<ImageIcon className="w-4 h-4" />}
+          value={logo}
+          onUpload={setLogo}
+          onClear={clearLogo}
+          uploadOcid="pengaturan.logo.upload_button"
+          dropzoneOcid="pengaturan.logo.dropzone"
+          deleteOcid="pengaturan.logo.delete_button"
         />
       </div>
 
+      {/* Signature & Stamp section */}
+      <div>
+        <h2 className="text-sm font-semibold text-foreground mb-3 uppercase tracking-wider">
+          Signature & Stamp
+        </h2>
+        <p className="text-xs text-muted-foreground mb-4">
+          The signature and stamp will be merged together in the document
+          footer. Use transparent PNG for the best result.
+        </p>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <UploadArea
+            label="Digital Signature"
+            description="Upload doctor's signature image (transparent PNG recommended)"
+            icon={<UserPen className="w-4 h-4" />}
+            value={signature}
+            onUpload={setSignature}
+            onClear={clearSignature}
+            uploadOcid="pengaturan.signature.upload_button"
+            dropzoneOcid="pengaturan.signature.dropzone"
+            deleteOcid="pengaturan.signature.delete_button"
+          />
+
+          <UploadArea
+            label="Clinic Stamp"
+            description="Upload clinic's official stamp image (transparent PNG recommended)"
+            icon={<Stamp className="w-4 h-4" />}
+            value={stamp}
+            onUpload={setStamp}
+            onClear={clearStamp}
+            uploadOcid="pengaturan.stamp.upload_button"
+            dropzoneOcid="pengaturan.stamp.dropzone"
+            deleteOcid="pengaturan.stamp.delete_button"
+          />
+        </div>
+      </div>
+
       {/* Preview section */}
-      {(signature || stamp) && (
+      {(signature || stamp || logo) && (
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -245,60 +281,66 @@ export default function PengaturanPage() {
           <Card>
             <CardHeader className="pb-3 border-b border-border/60">
               <CardTitle className="text-base font-semibold">
-                Preview pada Dokumen
+                Document Preview
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-5">
               <div className="border border-dashed border-border/60 rounded-lg p-6 bg-white">
-                <div className="flex justify-between items-end">
-                  {/* Left: signature area */}
-                  <div className="text-center text-xs text-gray-500">
-                    <p>
-                      Kuta, Bali,{" "}
-                      {new Date().toLocaleDateString("id-ID", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })}
-                    </p>
-                    <p className="mt-1">Dokter Pemeriksa,</p>
-                    <div className="h-16 flex items-center justify-center mt-1">
-                      {signature ? (
-                        <img
-                          src={signature}
-                          alt="Tanda tangan"
-                          className="max-h-14 max-w-[160px] object-contain"
-                        />
-                      ) : (
-                        <div className="h-14 w-28 border border-dashed border-gray-300 rounded flex items-center justify-center text-gray-300 text-[10px]">
-                          Tanda tangan
-                        </div>
-                      )}
-                    </div>
-                    <p className="font-semibold text-gray-800">
-                      dr. Romy Kamaluddin
-                    </p>
-                    <p className="text-gray-400">Dokter Umum</p>
+                {/* Header preview with logo */}
+                {logo && (
+                  <div className="flex justify-center mb-4 pb-3 border-b-2 border-gray-300">
+                    <img
+                      src={logo}
+                      alt="Clinic Logo"
+                      className="max-h-16 max-w-[200px] object-contain"
+                    />
                   </div>
+                )}
 
-                  {/* Right: stamp */}
-                  <div className="flex items-center justify-center">
-                    {stamp ? (
-                      <img
-                        src={stamp}
-                        alt="Cap klinik"
-                        className="max-h-20 max-w-[100px] object-contain opacity-80"
-                      />
-                    ) : (
-                      <div className="h-20 w-20 border border-dashed border-gray-300 rounded-full flex items-center justify-center text-gray-300 text-[10px] text-center">
-                        Cap klinik
+                {/* Signature + stamp merged area */}
+                {(signature || stamp) && (
+                  <div className="flex justify-end">
+                    <div className="text-center">
+                      <p className="text-xs text-gray-500">
+                        Kuta, Bali,{" "}
+                        {new Date().toLocaleDateString("en-GB", {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
+                        })}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Examining Doctor,
+                      </p>
+                      {/* Merged signature + stamp */}
+                      <div className="relative inline-flex items-center justify-center mt-2 h-20 w-48">
+                        {signature && (
+                          <img
+                            src={signature}
+                            alt="Signature"
+                            className="absolute inset-0 w-full h-full object-contain z-10"
+                          />
+                        )}
+                        {stamp && (
+                          <img
+                            src={stamp}
+                            alt="Clinic stamp"
+                            className="absolute inset-0 w-full h-full object-contain opacity-60 z-20"
+                          />
+                        )}
                       </div>
-                    )}
+                      <p className="text-xs font-semibold text-gray-800 mt-1">
+                        dr. Romy Kamaluddin
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        General Practitioner
+                      </p>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
               <p className="text-xs text-muted-foreground mt-2 text-center">
-                Tampilan preview area tanda tangan pada dokumen cetak
+                Preview of the header and signature area on printed documents
               </p>
             </CardContent>
           </Card>

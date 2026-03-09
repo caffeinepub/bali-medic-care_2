@@ -22,66 +22,66 @@
   :root {
     --radius: 0.5rem;
 
-    /* ─── Bali Medic Care — Refined Teal & Warm White Palette ─── */
+    /* ─── Bali Medic Care — Bright Blue Palette ─── */
 
-    /* Page background: warm near-white with very faint teal tint */
-    --background: 0.97 0.008 210;
-    /* Main text: deep blue-slate — L=0.12 for strong contrast on white */
-    --foreground: 0.12 0.025 240;
+    /* Page background: cool near-white with faint blue tint */
+    --background: 0.97 0.010 235;
+    /* Main text: deep navy — maximum contrast on white */
+    --foreground: 0.10 0.030 250;
 
     /* Card: pure crisp white */
     --card: 1 0 0;
-    --card-foreground: 0.12 0.025 240;
+    --card-foreground: 0.10 0.030 250;
 
     --popover: 1 0 0;
-    --popover-foreground: 0.12 0.025 240;
+    --popover-foreground: 0.10 0.030 250;
 
-    /* Primary: vivid teal — saturated enough to pop, dark enough for white text */
-    --primary: 0.42 0.12 205;
+    /* Primary: vivid bright blue — sky blue, energetic */
+    --primary: 0.55 0.22 255;
     --primary-foreground: 0.99 0 0;
 
-    /* Secondary: light teal wash — used for secondary button bg */
-    --secondary: 0.93 0.02 205;
-    /* Secondary foreground: dark teal — clear on light-teal bg */
-    --secondary-foreground: 0.20 0.06 210;
+    /* Secondary: light blue wash */
+    --secondary: 0.92 0.030 235;
+    /* Secondary foreground: dark blue — clear on light-blue bg */
+    --secondary-foreground: 0.15 0.08 250;
 
-    /* Muted: very pale blue-gray bg for low-emphasis areas */
-    --muted: 0.93 0.012 215;
-    /* Muted text: medium slate — L=0.45 ensures readability, C=0.04 gives teal undertone */
-    --muted-foreground: 0.45 0.04 220;
+    /* Muted: very pale blue-gray bg */
+    --muted: 0.93 0.015 230;
+    /* Muted text: medium-dark slate with blue undertone */
+    --muted-foreground: 0.40 0.05 240;
 
-    /* Gold accent — kept warm for warmth against the cool teal */
-    --accent: 0.88 0.08 85;
-    --accent-foreground: 0.18 0.05 50;
+    /* Cyan accent — bright and fresh */
+    --accent: 0.78 0.14 200;
+    --accent-foreground: 0.10 0.08 230;
 
-    --destructive: 0.577 0.245 27.325;
+    --destructive: 0.55 0.22 27.325;
     --destructive-foreground: 0.985 0 0;
 
-    /* Borders: slightly more visible for clear structure */
-    --border: 0.87 0.02 215;
-    --input: 0.87 0.02 215;
-    --ring: 0.42 0.12 205;
+    /* Borders: light blue-gray for clear structure */
+    --border: 0.84 0.025 230;
+    --input: 0.84 0.025 230;
+    --ring: 0.55 0.22 255;
 
-    /* Charts: vivid, distinct, high-contrast set */
-    --chart-1: 0.52 0.14 205;
-    --chart-2: 0.62 0.16 160;
-    --chart-3: 0.72 0.12 85;
-    --chart-4: 0.48 0.11 265;
-    --chart-5: 0.60 0.15 30;
+    /* Charts: vivid blue-toned set */
+    --chart-1: 0.55 0.22 255;
+    --chart-2: 0.60 0.18 200;
+    --chart-3: 0.68 0.14 165;
+    --chart-4: 0.50 0.16 280;
+    --chart-5: 0.65 0.14 220;
 
-    /* ─── Sidebar — Deep Teal ─── */
-    --sidebar: 0.20 0.065 218;
-    /* Sidebar text: bright white with subtle teal — high chroma so not washed out */
-    --sidebar-foreground: 0.96 0.018 210;
-    /* Sidebar primary: warm gold — brighter, more vibrant */
-    --sidebar-primary: 0.82 0.14 82;
-    --sidebar-primary-foreground: 0.14 0.05 50;
-    /* Sidebar active state: slightly lighter teal overlay */
-    --sidebar-accent: 0.30 0.08 215;
+    /* ─── Sidebar — Deep Royal Blue ─── */
+    --sidebar: 0.16 0.08 255;
+    /* Sidebar text: bright white — high contrast on deep blue */
+    --sidebar-foreground: 0.97 0.008 235;
+    /* Sidebar primary: bright cyan-blue highlight */
+    --sidebar-primary: 0.68 0.18 210;
+    --sidebar-primary-foreground: 0.10 0.07 240;
+    /* Sidebar active state: slightly lighter blue overlay */
+    --sidebar-accent: 0.26 0.10 255;
     /* Sidebar accent text: crisp white */
-    --sidebar-accent-foreground: 0.97 0.012 210;
-    --sidebar-border: 0.28 0.06 218;
-    --sidebar-ring: 0.55 0.09 205;
+    --sidebar-accent-foreground: 0.98 0.005 235;
+    --sidebar-border: 0.24 0.07 255;
+    --sidebar-ring: 0.55 0.18 255;
   }
 
   * {
@@ -107,7 +107,7 @@
   }
 
   a:hover {
-    color: oklch(0.32 0.10 205);
+    color: oklch(0.45 0.18 255);
   }
 
   /* Improve input legibility */
@@ -161,7 +161,7 @@
 }
 
 .card-hover-lift:hover {
-  box-shadow: 0 8px 24px 0 oklch(0.20 0.065 218 / 0.14), 0 2px 6px -1px oklch(0.20 0.065 218 / 0.10);
+  box-shadow: 0 8px 24px 0 oklch(0.16 0.08 255 / 0.14), 0 2px 6px -1px oklch(0.16 0.08 255 / 0.10);
   transform: translateY(-1px);
 }
 
@@ -169,13 +169,21 @@
 @media print {
   @page {
     margin: 1.5cm;
-    size: A4;
+    size: A4 portrait;
+  }
+
+  html, body {
+    width: 210mm;
+    height: 297mm;
   }
 
   .print-container {
-    width: 100% !important;
-    max-width: 100% !important;
+    width: 210mm !important;
+    max-width: 210mm !important;
+    min-height: auto !important;
     padding: 0 !important;
     margin: 0 !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
   }
 }

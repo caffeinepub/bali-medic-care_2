@@ -89,7 +89,7 @@ export default function SuratSakitPage({ onPrint }: Props) {
 
   const handleSubmit = async () => {
     if (!form.patientId || !form.doctorId || !form.diagnosis) {
-      toast.error("Pasien, dokter, dan diagnosis wajib diisi");
+      toast.error("Patient, doctor, and diagnosis are required");
       return;
     }
     try {
@@ -103,10 +103,10 @@ export default function SuratSakitPage({ onPrint }: Props) {
         issuedDate: dateToBigIntNanos(form.issuedDate),
         notes: form.notes,
       });
-      toast.success("Surat Keterangan Sakit dibuat");
+      toast.success("Sick Note created");
       setFormOpen(false);
     } catch {
-      toast.error("Gagal membuat surat keterangan sakit");
+      toast.error("Failed to create sick note");
     }
   };
 
@@ -114,10 +114,10 @@ export default function SuratSakitPage({ onPrint }: Props) {
     if (!deleteId) return;
     try {
       await deleteMutation.mutateAsync(deleteId);
-      toast.success("Surat dihapus");
+      toast.success("Document deleted");
       setDeleteId(null);
     } catch {
-      toast.error("Gagal menghapus surat");
+      toast.error("Failed to delete document");
     }
   };
 
@@ -126,10 +126,10 @@ export default function SuratSakitPage({ onPrint }: Props) {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display text-2xl font-bold text-foreground">
-            Surat Keterangan Sakit
+            Sick Notes
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Kelola surat keterangan sakit pasien
+            Manage patient sick notes
           </p>
         </div>
         <Button
@@ -138,7 +138,7 @@ export default function SuratSakitPage({ onPrint }: Props) {
           className="gap-2"
         >
           <Plus className="w-4 h-4" />
-          Buat Surat
+          New Sick Note
         </Button>
       </div>
 
@@ -155,7 +155,7 @@ export default function SuratSakitPage({ onPrint }: Props) {
               data-ocid="surat-sakit.empty_state"
               className="text-center py-12 text-muted-foreground"
             >
-              <p className="text-sm">Belum ada surat keterangan sakit</p>
+              <p className="text-sm">No sick notes yet</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -163,25 +163,25 @@ export default function SuratSakitPage({ onPrint }: Props) {
                 <thead>
                   <tr className="border-b border-border bg-muted/30">
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                      Pasien
+                      Patient
                     </th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide hidden sm:table-cell">
-                      Dokter
+                      Doctor
                     </th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide hidden md:table-cell">
                       Diagnosis
                     </th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide hidden lg:table-cell">
-                      Periode
+                      Period
                     </th>
                     <th className="text-center px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide hidden md:table-cell">
-                      Hari Istirahat
+                      Rest Days
                     </th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                      Tgl Terbit
+                      Issued Date
                     </th>
                     <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                      Aksi
+                      Actions
                     </th>
                   </tr>
                 </thead>
@@ -211,7 +211,7 @@ export default function SuratSakitPage({ onPrint }: Props) {
                           {formatDate(note.endDate)}
                         </td>
                         <td className="px-4 py-3 text-center font-medium hidden md:table-cell">
-                          {String(note.restDays)} hari
+                          {String(note.restDays)} days
                         </td>
                         <td className="px-4 py-3 text-muted-foreground">
                           {formatDate(note.issuedDate)}
@@ -252,13 +252,11 @@ export default function SuratSakitPage({ onPrint }: Props) {
       <Dialog open={formOpen} onOpenChange={setFormOpen}>
         <DialogContent className="sm:max-w-lg" data-ocid="surat-sakit.dialog">
           <DialogHeader>
-            <DialogTitle className="font-display">
-              Buat Surat Keterangan Sakit
-            </DialogTitle>
+            <DialogTitle className="font-display">Create Sick Note</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2 max-h-[60vh] overflow-y-auto pr-2">
             <div>
-              <Label>Pasien *</Label>
+              <Label>Patient *</Label>
               <Select
                 value={form.patientId}
                 onValueChange={(v) => setForm((f) => ({ ...f, patientId: v }))}
@@ -267,7 +265,7 @@ export default function SuratSakitPage({ onPrint }: Props) {
                   data-ocid="surat-sakit.patient.select"
                   className="mt-1"
                 >
-                  <SelectValue placeholder="Pilih pasien" />
+                  <SelectValue placeholder="Select patient" />
                 </SelectTrigger>
                 <SelectContent>
                   {(patients ?? []).map((p) => (
@@ -279,7 +277,7 @@ export default function SuratSakitPage({ onPrint }: Props) {
               </Select>
             </div>
             <div>
-              <Label>Dokter *</Label>
+              <Label>Doctor *</Label>
               <Select
                 value={form.doctorId}
                 onValueChange={(v) => setForm((f) => ({ ...f, doctorId: v }))}
@@ -288,7 +286,7 @@ export default function SuratSakitPage({ onPrint }: Props) {
                   data-ocid="surat-sakit.doctor.select"
                   className="mt-1"
                 >
-                  <SelectValue placeholder="Pilih dokter" />
+                  <SelectValue placeholder="Select doctor" />
                 </SelectTrigger>
                 <SelectContent>
                   {(doctors ?? []).map((d) => (
@@ -308,13 +306,13 @@ export default function SuratSakitPage({ onPrint }: Props) {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, diagnosis: e.target.value }))
                 }
-                placeholder="Diagnosis penyakit"
+                placeholder="Medical diagnosis"
                 className="mt-1"
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="startDate">Tgl Mulai</Label>
+                <Label htmlFor="startDate">Start Date</Label>
                 <Input
                   id="startDate"
                   type="date"
@@ -327,7 +325,7 @@ export default function SuratSakitPage({ onPrint }: Props) {
                 />
               </div>
               <div>
-                <Label htmlFor="endDate">Tgl Selesai</Label>
+                <Label htmlFor="endDate">End Date</Label>
                 <Input
                   id="endDate"
                   type="date"
@@ -341,13 +339,13 @@ export default function SuratSakitPage({ onPrint }: Props) {
               </div>
             </div>
             <div className="bg-muted rounded-lg p-3 text-sm">
-              <span className="text-muted-foreground">Lama istirahat: </span>
+              <span className="text-muted-foreground">Rest period: </span>
               <span className="font-semibold text-foreground">
-                {restDays} hari
+                {restDays} days
               </span>
             </div>
             <div>
-              <Label htmlFor="issuedDate">Tanggal Terbit</Label>
+              <Label htmlFor="issuedDate">Issue Date</Label>
               <Input
                 id="issuedDate"
                 type="date"
@@ -360,7 +358,7 @@ export default function SuratSakitPage({ onPrint }: Props) {
               />
             </div>
             <div>
-              <Label htmlFor="notes">Catatan Tambahan</Label>
+              <Label htmlFor="notes">Additional Notes</Label>
               <Textarea
                 id="notes"
                 data-ocid="surat-sakit.textarea"
@@ -368,7 +366,7 @@ export default function SuratSakitPage({ onPrint }: Props) {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, notes: e.target.value }))
                 }
-                placeholder="Catatan untuk pasien (opsional)"
+                placeholder="Notes for patient (optional)"
                 className="mt-1"
                 rows={3}
               />
@@ -380,14 +378,14 @@ export default function SuratSakitPage({ onPrint }: Props) {
               variant="outline"
               onClick={() => setFormOpen(false)}
             >
-              Batal
+              Cancel
             </Button>
             <Button
               data-ocid="surat-sakit.submit_button"
               onClick={handleSubmit}
               disabled={createMutation.isPending}
             >
-              {createMutation.isPending ? "Menyimpan..." : "Buat Surat"}
+              {createMutation.isPending ? "Saving..." : "Create Sick Note"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -397,21 +395,21 @@ export default function SuratSakitPage({ onPrint }: Props) {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent data-ocid="surat-sakit.delete.dialog">
           <AlertDialogHeader>
-            <AlertDialogTitle>Hapus Surat Keterangan Sakit?</AlertDialogTitle>
+            <AlertDialogTitle>Delete Sick Note?</AlertDialogTitle>
             <AlertDialogDescription>
-              Surat akan dihapus permanen.
+              The document will be permanently deleted.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel data-ocid="surat-sakit.cancel_button">
-              Batal
+              Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               data-ocid="surat-sakit.confirm_button"
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Hapus
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

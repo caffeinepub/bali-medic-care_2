@@ -97,7 +97,7 @@ export default function KatalogLayananPage() {
 
   const handleSubmit = async () => {
     if (!form.name || !form.basePrice) {
-      toast.error("Nama dan harga wajib diisi");
+      toast.error("Name and price are required");
       return;
     }
     const price = BigInt(
@@ -113,18 +113,18 @@ export default function KatalogLayananPage() {
           category: form.category,
           basePrice: price,
         });
-        toast.success("Layanan diperbarui");
+        toast.success("Service updated");
       } else {
         await createMutation.mutateAsync({
           name: form.name,
           category: form.category,
           basePrice: price,
         });
-        toast.success("Layanan baru ditambahkan");
+        toast.success("New service added");
       }
       setFormOpen(false);
     } catch {
-      toast.error("Gagal menyimpan layanan");
+      toast.error("Failed to save service");
     }
   };
 
@@ -132,10 +132,10 @@ export default function KatalogLayananPage() {
     if (!deleteId) return;
     try {
       await deleteMutation.mutateAsync(deleteId);
-      toast.success("Layanan dihapus");
+      toast.success("Service deleted");
       setDeleteId(null);
     } catch {
-      toast.error("Gagal menghapus layanan");
+      toast.error("Failed to delete service");
     }
   };
 
@@ -146,10 +146,10 @@ export default function KatalogLayananPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display text-2xl font-bold text-foreground">
-            Katalog Layanan
+            Service Catalog
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Kelola layanan dan tindakan klinik
+            Manage clinic services and procedures
           </p>
         </div>
         <Button
@@ -158,7 +158,7 @@ export default function KatalogLayananPage() {
           className="gap-2"
         >
           <Plus className="w-4 h-4" />
-          Tambah Layanan
+          Add Service
         </Button>
       </div>
 
@@ -175,7 +175,7 @@ export default function KatalogLayananPage() {
               data-ocid="katalog.empty_state"
               className="text-center py-12 text-muted-foreground"
             >
-              <p className="text-sm">Belum ada layanan terdaftar</p>
+              <p className="text-sm">No services registered yet</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -183,16 +183,16 @@ export default function KatalogLayananPage() {
                 <thead>
                   <tr className="border-b border-border bg-muted/30">
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                      Nama Layanan
+                      Service Name
                     </th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide hidden sm:table-cell">
-                      Kategori
+                      Category
                     </th>
                     <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                      Harga Dasar
+                      Base Price
                     </th>
                     <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                      Aksi
+                      Actions
                     </th>
                   </tr>
                 </thead>
@@ -250,12 +250,12 @@ export default function KatalogLayananPage() {
         <DialogContent className="sm:max-w-md" data-ocid="katalog.dialog">
           <DialogHeader>
             <DialogTitle className="font-display">
-              {editService ? "Edit Layanan" : "Tambah Layanan Baru"}
+              {editService ? "Edit Service" : "Add New Service"}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div>
-              <Label htmlFor="s-name">Nama Layanan *</Label>
+              <Label htmlFor="s-name">Service Name *</Label>
               <Input
                 id="s-name"
                 data-ocid="katalog.input"
@@ -263,12 +263,12 @@ export default function KatalogLayananPage() {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, name: e.target.value }))
                 }
-                placeholder="Nama layanan"
+                placeholder="Service name"
                 className="mt-1"
               />
             </div>
             <div>
-              <Label>Kategori</Label>
+              <Label>Category</Label>
               <Select
                 value={form.category}
                 onValueChange={(v) => setForm((f) => ({ ...f, category: v }))}
@@ -289,7 +289,7 @@ export default function KatalogLayananPage() {
               </Select>
             </div>
             <div>
-              <Label htmlFor="s-price">Harga Dasar (Rp) *</Label>
+              <Label htmlFor="s-price">Base Price (Rp) *</Label>
               <Input
                 id="s-price"
                 data-ocid="katalog.price.input"
@@ -309,14 +309,14 @@ export default function KatalogLayananPage() {
               variant="outline"
               onClick={() => setFormOpen(false)}
             >
-              Batal
+              Cancel
             </Button>
             <Button
               data-ocid="katalog.submit_button"
               onClick={handleSubmit}
               disabled={isPending}
             >
-              {isPending ? "Menyimpan..." : editService ? "Simpan" : "Tambah"}
+              {isPending ? "Saving..." : editService ? "Save" : "Add"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -326,21 +326,21 @@ export default function KatalogLayananPage() {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent data-ocid="katalog.delete.dialog">
           <AlertDialogHeader>
-            <AlertDialogTitle>Hapus Layanan?</AlertDialogTitle>
+            <AlertDialogTitle>Delete Service?</AlertDialogTitle>
             <AlertDialogDescription>
-              Layanan akan dihapus permanen.
+              The service will be permanently deleted.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel data-ocid="katalog.cancel_button">
-              Batal
+              Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               data-ocid="katalog.confirm_button"
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Hapus
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

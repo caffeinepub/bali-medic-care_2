@@ -17,7 +17,7 @@ const CLINIC_PHONE = "+62 818-588-911";
 export default function PrintInvoicePage({ invoiceId, onBack }: Props) {
   const { data: invoices } = useGetInvoices();
   const { data: patients } = useGetPatients();
-  const { signature, stamp } = useClinicSettings();
+  const { signature, stamp, logo } = useClinicSettings();
 
   const invoice = invoices?.find((inv) => inv.id === invoiceId);
   const patient = invoice
@@ -27,9 +27,9 @@ export default function PrintInvoicePage({ invoiceId, onBack }: Props) {
   if (!invoice || !patient) {
     return (
       <div className="p-8 text-center text-muted-foreground">
-        <p>Invoice tidak ditemukan.</p>
+        <p>Invoice not found.</p>
         <Button variant="outline" onClick={onBack} className="mt-4">
-          Kembali
+          Back
         </Button>
       </div>
     );
@@ -51,7 +51,7 @@ export default function PrintInvoicePage({ invoiceId, onBack }: Props) {
           className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="w-4 h-4" />
-          Kembali
+          Back
         </button>
         <Button
           data-ocid="print.invoice.button"
@@ -59,20 +59,40 @@ export default function PrintInvoicePage({ invoiceId, onBack }: Props) {
           className="gap-2"
         >
           <Printer className="w-4 h-4" />
-          Cetak Invoice
+          Print Invoice
         </Button>
       </div>
 
-      {/* Invoice document */}
-      <div className="print-container max-w-3xl mx-auto my-8 bg-white shadow-lg p-10 print:shadow-none print:my-0 print:p-8">
+      {/* Invoice document — A4 width */}
+      <div className="print-container max-w-[794px] mx-auto my-8 bg-white shadow-lg px-12 py-10 print:shadow-none print:my-0 print:px-0 print:py-0">
         {/* Header */}
-        <div className="text-center border-b-2 border-gray-800 pb-4 mb-6">
-          <h1 className="font-display text-2xl font-bold text-gray-900">
-            {CLINIC_NAME}
-          </h1>
-          <p className="text-sm text-gray-600 mt-0.5">{CLINIC_DOCTOR}</p>
-          <p className="text-xs text-gray-500 mt-0.5">{CLINIC_ADDRESS}</p>
-          <p className="text-xs text-gray-500">Telp: {CLINIC_PHONE}</p>
+        <div className="border-b-2 border-gray-800 pb-4 mb-6">
+          {logo ? (
+            <div className="flex items-center gap-4 mb-2">
+              <img
+                src={logo}
+                alt="Clinic Logo"
+                className="max-h-16 max-w-[120px] object-contain"
+              />
+              <div>
+                <h1 className="font-display text-2xl font-bold text-gray-900">
+                  {CLINIC_NAME}
+                </h1>
+                <p className="text-sm text-gray-600 mt-0.5">{CLINIC_DOCTOR}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{CLINIC_ADDRESS}</p>
+                <p className="text-xs text-gray-500">Telp: {CLINIC_PHONE}</p>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center">
+              <h1 className="font-display text-2xl font-bold text-gray-900">
+                {CLINIC_NAME}
+              </h1>
+              <p className="text-sm text-gray-600 mt-0.5">{CLINIC_DOCTOR}</p>
+              <p className="text-xs text-gray-500 mt-0.5">{CLINIC_ADDRESS}</p>
+              <p className="text-xs text-gray-500">Telp: {CLINIC_PHONE}</p>
+            </div>
+          )}
         </div>
 
         {/* Title */}
@@ -90,31 +110,31 @@ export default function PrintInvoicePage({ invoiceId, onBack }: Props) {
         {/* Patient Info Grid */}
         <div className="grid grid-cols-2 gap-x-8 gap-y-2 mb-6 text-sm border border-gray-200 rounded-lg p-4">
           <div>
-            <span className="text-gray-500 text-xs">Nama Pasien</span>
+            <span className="text-gray-500 text-xs">Patient Name</span>
             <p className="font-semibold text-gray-900">{patient.name}</p>
           </div>
           <div>
-            <span className="text-gray-500 text-xs">No. Registrasi</span>
+            <span className="text-gray-500 text-xs">Registration No.</span>
             <p className="font-semibold text-gray-900">{invoice.regNo}</p>
           </div>
           <div>
-            <span className="text-gray-500 text-xs">No. Pasien</span>
+            <span className="text-gray-500 text-xs">Patient No.</span>
             <p className="text-gray-800">{patient.patientNo}</p>
           </div>
           <div>
-            <span className="text-gray-500 text-xs">Tgl. Registrasi</span>
+            <span className="text-gray-500 text-xs">Registration Date</span>
             <p className="text-gray-800">
               {formatDate(invoice.registrationDate)}
             </p>
           </div>
           {invoice.payer && (
             <div>
-              <span className="text-gray-500 text-xs">Payer / Penanggung</span>
+              <span className="text-gray-500 text-xs">Payer / Guarantor</span>
               <p className="text-gray-800">{invoice.payer}</p>
             </div>
           )}
           <div>
-            <span className="text-gray-500 text-xs">Tanggal Cetak</span>
+            <span className="text-gray-500 text-xs">Print Date</span>
             <p className="text-gray-800">
               {formatDate(invoice.dateOfPrinting)}
             </p>
@@ -125,13 +145,13 @@ export default function PrintInvoicePage({ invoiceId, onBack }: Props) {
         <table className="w-full text-xs mb-6 border-collapse">
           <thead>
             <tr className="bg-gray-800 text-white">
-              <th className="text-left px-3 py-2 font-medium">Tanggal</th>
-              <th className="text-left px-3 py-2 font-medium">Kategori</th>
-              <th className="text-left px-3 py-2 font-medium">Keterangan</th>
-              <th className="text-right px-3 py-2 font-medium">Harga Dasar</th>
+              <th className="text-left px-3 py-2 font-medium">Date</th>
+              <th className="text-left px-3 py-2 font-medium">Category</th>
+              <th className="text-left px-3 py-2 font-medium">Description</th>
+              <th className="text-right px-3 py-2 font-medium">Base Price</th>
               <th className="text-center px-3 py-2 font-medium">Qty</th>
-              <th className="text-right px-3 py-2 font-medium">Diskon</th>
-              <th className="text-right px-3 py-2 font-medium">Tagihan</th>
+              <th className="text-right px-3 py-2 font-medium">Discount</th>
+              <th className="text-right px-3 py-2 font-medium">Charge</th>
             </tr>
           </thead>
           <tbody>
@@ -187,7 +207,7 @@ export default function PrintInvoicePage({ invoiceId, onBack }: Props) {
                 colSpan={6}
                 className="px-3 pt-1 text-right font-bold text-gray-900 text-sm"
               >
-                TOTAL TAGIHAN
+                TOTAL BILL
               </td>
               <td className="px-3 pt-1 text-right font-bold text-gray-900 text-sm">
                 {formatRupiah(subtotal)}
@@ -196,37 +216,39 @@ export default function PrintInvoicePage({ invoiceId, onBack }: Props) {
           </tfoot>
         </table>
 
-        {/* Footer */}
-        <div className="mt-8 flex justify-between items-end text-xs text-gray-500">
-          <div>
-            <p className="mb-2">
+        {/* Footer — signature + stamp at BOTTOM LEFT */}
+        <div className="mt-8 flex justify-start text-xs text-gray-500">
+          <div className="text-center">
+            <p className="mb-1">
               Kuta, Bali, {formatDate(invoice.dateOfPrinting)}
             </p>
-            <p className="mb-1">Dokter Pemeriksa,</p>
-            <div className="h-16 flex items-center justify-start">
+            <p className="mb-1">Examining Doctor,</p>
+
+            {/* Merged signature + stamp overlay */}
+            <div className="relative inline-flex items-center justify-center h-24 w-56 mt-1">
               {signature && (
                 <img
                   src={signature}
-                  alt="Tanda tangan"
-                  className="max-h-16 max-w-[180px] object-contain"
+                  alt="Signature"
+                  className="absolute inset-0 w-full h-full object-contain z-10"
+                />
+              )}
+              {stamp && (
+                <img
+                  src={stamp}
+                  alt="Clinic stamp"
+                  className="absolute inset-0 w-full h-full object-contain opacity-80 z-20"
                 />
               )}
             </div>
-            <p className="font-semibold text-gray-800">{CLINIC_DOCTOR}</p>
+
+            <p className="font-semibold text-gray-800 mt-1">{CLINIC_DOCTOR}</p>
             <p className="text-gray-500">{CLINIC_NAME}</p>
           </div>
-          <div className="flex flex-col items-end gap-2">
-            {stamp && (
-              <img
-                src={stamp}
-                alt="Cap klinik"
-                className="max-h-16 max-w-[100px] object-contain opacity-80"
-              />
-            )}
-            <p className="text-gray-400 text-[10px]">
-              Dokumen ini dihasilkan secara elektronik
-            </p>
-          </div>
+        </div>
+
+        <div className="mt-4 text-[10px] text-gray-400 border-t border-gray-100 pt-3 text-center">
+          This document was generated electronically
         </div>
       </div>
     </div>

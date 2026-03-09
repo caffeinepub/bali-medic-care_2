@@ -55,7 +55,7 @@ export default function DashboardPage({ navigate }: Props) {
   const stats = [
     {
       id: "total-pasien",
-      label: "Total Pasien",
+      label: "Total Patients",
       value: patients.data?.length ?? 0,
       icon: Users,
       color: "bg-blue-50 text-blue-600",
@@ -63,7 +63,7 @@ export default function DashboardPage({ navigate }: Props) {
     },
     {
       id: "invoice-today",
-      label: "Invoice Hari Ini",
+      label: "Today's Invoices",
       value: invoicesToday.length,
       icon: FileText,
       color: "bg-teal-50 text-teal-600",
@@ -71,7 +71,7 @@ export default function DashboardPage({ navigate }: Props) {
     },
     {
       id: "total-invoice",
-      label: "Total Invoice",
+      label: "Total Invoices",
       value: invoices.data?.length ?? 0,
       icon: TrendingUp,
       color: "bg-emerald-50 text-emerald-600",
@@ -79,7 +79,7 @@ export default function DashboardPage({ navigate }: Props) {
     },
     {
       id: "total-surat",
-      label: "Total Surat Keterangan",
+      label: "Total Documents",
       value: totalDocuments,
       icon: Heart,
       color: "bg-rose-50 text-rose-600",
@@ -95,7 +95,8 @@ export default function DashboardPage({ navigate }: Props) {
           Dashboard
         </h1>
         <p className="text-sm text-muted-foreground mt-0.5">
-          Bali Medic Care — {formatDate(BigInt(Date.now()) * BigInt(1_000_000))}
+          Bali Medic Care &mdash;{" "}
+          {formatDate(BigInt(Date.now()) * BigInt(1_000_000))}
         </p>
       </div>
 
@@ -137,7 +138,9 @@ export default function DashboardPage({ navigate }: Props) {
       {/* Quick Actions */}
       <Card className="shadow-card">
         <CardHeader className="pb-3">
-          <CardTitle className="text-base font-display">Aksi Cepat</CardTitle>
+          <CardTitle className="text-base font-display">
+            Quick Actions
+          </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-3">
           <Button
@@ -146,7 +149,7 @@ export default function DashboardPage({ navigate }: Props) {
             className="gap-2"
           >
             <PlusCircle className="w-4 h-4" />
-            Buat Invoice
+            New Invoice
           </Button>
           <Button
             data-ocid="dashboard.surat-sakit.secondary_button"
@@ -155,7 +158,7 @@ export default function DashboardPage({ navigate }: Props) {
             className="gap-2"
           >
             <Cross className="w-4 h-4" />
-            Surat Keterangan Sakit
+            Sick Note
           </Button>
           <Button
             data-ocid="dashboard.surat-sehat.secondary_button"
@@ -164,7 +167,7 @@ export default function DashboardPage({ navigate }: Props) {
             className="gap-2"
           >
             <Heart className="w-4 h-4" />
-            Surat Keterangan Sehat
+            Health Certificate
           </Button>
           <Button
             data-ocid="dashboard.pasien.secondary_button"
@@ -173,7 +176,7 @@ export default function DashboardPage({ navigate }: Props) {
             className="gap-2"
           >
             <Users className="w-4 h-4" />
-            Tambah Pasien
+            Add Patient
           </Button>
         </CardContent>
       </Card>
@@ -184,7 +187,7 @@ export default function DashboardPage({ navigate }: Props) {
         <Card className="shadow-card">
           <CardHeader className="pb-3">
             <CardTitle className="text-base font-display">
-              Invoice Terbaru
+              Recent Invoices
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -199,7 +202,7 @@ export default function DashboardPage({ navigate }: Props) {
                 data-ocid="invoice.empty_state"
                 className="text-center py-6 text-muted-foreground text-sm"
               >
-                Belum ada invoice
+                No invoices yet
               </div>
             ) : (
               <div className="space-y-2">
@@ -251,7 +254,7 @@ export default function DashboardPage({ navigate }: Props) {
         <Card className="shadow-card">
           <CardHeader className="pb-3">
             <CardTitle className="text-base font-display">
-              Pasien Terbaru
+              Recent Patients
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -266,7 +269,7 @@ export default function DashboardPage({ navigate }: Props) {
                 data-ocid="pasien.empty_state"
                 className="text-center py-6 text-muted-foreground text-sm"
               >
-                Belum ada data pasien
+                No patient data yet
               </div>
             ) : (
               <div className="space-y-2">
@@ -283,10 +286,10 @@ export default function DashboardPage({ navigate }: Props) {
                       <p className="text-xs text-muted-foreground">
                         {p.patientNo} ·{" "}
                         {p.gender === "male"
-                          ? "Laki-laki"
+                          ? "Male"
                           : p.gender === "female"
-                            ? "Perempuan"
-                            : "Lainnya"}
+                            ? "Female"
+                            : "Other"}
                       </p>
                     </div>
                     <p className="text-xs text-muted-foreground">

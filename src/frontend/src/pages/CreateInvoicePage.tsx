@@ -117,15 +117,15 @@ export default function CreateInvoicePage({ onSuccess, onCancel }: Props) {
 
   const handleSubmit = async () => {
     if (!patientId) {
-      toast.error("Pilih pasien terlebih dahulu");
+      toast.error("Please select a patient first");
       return;
     }
     if (!regNo) {
-      toast.error("Nomor registrasi wajib diisi");
+      toast.error("Registration number is required");
       return;
     }
     if (lineItems.length === 0) {
-      toast.error("Tambahkan minimal satu item");
+      toast.error("Add at least one item");
       return;
     }
 
@@ -149,10 +149,10 @@ export default function CreateInvoicePage({ onSuccess, onCancel }: Props) {
         status,
         lineItems: items,
       });
-      toast.success("Invoice berhasil dibuat");
+      toast.success("Invoice created successfully");
       onSuccess();
     } catch {
-      toast.error("Gagal membuat invoice");
+      toast.error("Failed to create invoice");
     }
   };
 
@@ -170,9 +170,9 @@ export default function CreateInvoicePage({ onSuccess, onCancel }: Props) {
         </button>
         <div>
           <h1 className="font-display text-2xl font-bold text-foreground">
-            Buat Invoice
+            Create Invoice
           </h1>
-          <p className="text-sm text-muted-foreground">Proforma Invoice Baru</p>
+          <p className="text-sm text-muted-foreground">New Proforma Invoice</p>
         </div>
       </div>
 
@@ -180,18 +180,18 @@ export default function CreateInvoicePage({ onSuccess, onCancel }: Props) {
       <Card className="shadow-card">
         <CardHeader>
           <CardTitle className="text-base font-display">
-            Informasi Pasien & Registrasi
+            Patient & Registration Info
           </CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="sm:col-span-2">
-            <Label>Pasien *</Label>
+            <Label>Patient *</Label>
             <Select value={patientId} onValueChange={setPatientId}>
               <SelectTrigger
                 data-ocid="invoice.patient.select"
                 className="mt-1"
               >
-                <SelectValue placeholder="Pilih pasien" />
+                <SelectValue placeholder="Select patient" />
               </SelectTrigger>
               <SelectContent>
                 {(patients ?? []).map((p) => (
@@ -203,7 +203,7 @@ export default function CreateInvoicePage({ onSuccess, onCancel }: Props) {
             </Select>
           </div>
           <div>
-            <Label htmlFor="regDate">Tanggal Registrasi</Label>
+            <Label htmlFor="regDate">Registration Date</Label>
             <Input
               id="regDate"
               type="date"
@@ -214,29 +214,29 @@ export default function CreateInvoicePage({ onSuccess, onCancel }: Props) {
             />
           </div>
           <div>
-            <Label htmlFor="regNo">Nomor Registrasi *</Label>
+            <Label htmlFor="regNo">Registration Number *</Label>
             <Input
               id="regNo"
               data-ocid="invoice.reg_no.input"
               value={regNo}
               onChange={(e) => setRegNo(e.target.value)}
-              placeholder="Contoh: OPDN25"
+              placeholder="e.g. OPDN25"
               className="mt-1"
             />
           </div>
           <div>
-            <Label htmlFor="payer">Payer / Penanggung</Label>
+            <Label htmlFor="payer">Payer / Guarantor</Label>
             <Input
               id="payer"
               data-ocid="invoice.payer.input"
               value={payer}
               onChange={(e) => setPayer(e.target.value)}
-              placeholder="Opsional"
+              placeholder="Optional"
               className="mt-1"
             />
           </div>
           <div>
-            <Label htmlFor="printDate">Tanggal Cetak</Label>
+            <Label htmlFor="printDate">Print Date</Label>
             <Input
               id="printDate"
               type="date"
@@ -267,7 +267,9 @@ export default function CreateInvoicePage({ onSuccess, onCancel }: Props) {
       {/* Line Items */}
       <Card className="shadow-card">
         <CardHeader className="flex-row items-center justify-between">
-          <CardTitle className="text-base font-display">Item Layanan</CardTitle>
+          <CardTitle className="text-base font-display">
+            Service Items
+          </CardTitle>
           <Button
             data-ocid="invoice.add_item.button"
             variant="outline"
@@ -276,7 +278,7 @@ export default function CreateInvoicePage({ onSuccess, onCancel }: Props) {
             className="gap-2"
           >
             <Plus className="w-3.5 h-3.5" />
-            Tambah Item
+            Add Item
           </Button>
         </CardHeader>
         <CardContent className="p-0">
@@ -285,28 +287,28 @@ export default function CreateInvoicePage({ onSuccess, onCancel }: Props) {
               <thead>
                 <tr className="border-b border-border bg-muted/30">
                   <th className="text-left px-3 py-2.5 text-xs font-semibold text-muted-foreground">
-                    Tanggal
+                    Date
                   </th>
                   <th className="text-left px-3 py-2.5 text-xs font-semibold text-muted-foreground">
-                    Dari Katalog
+                    From Catalog
                   </th>
                   <th className="text-left px-3 py-2.5 text-xs font-semibold text-muted-foreground">
-                    Kategori
+                    Category
                   </th>
                   <th className="text-left px-3 py-2.5 text-xs font-semibold text-muted-foreground">
-                    Keterangan
+                    Description
                   </th>
                   <th className="text-right px-3 py-2.5 text-xs font-semibold text-muted-foreground">
-                    Harga
+                    Price
                   </th>
                   <th className="text-center px-3 py-2.5 text-xs font-semibold text-muted-foreground">
                     Qty
                   </th>
                   <th className="text-right px-3 py-2.5 text-xs font-semibold text-muted-foreground">
-                    Diskon
+                    Discount
                   </th>
                   <th className="text-right px-3 py-2.5 text-xs font-semibold text-muted-foreground">
-                    Tagihan
+                    Charge
                   </th>
                   <th className="px-3 py-2.5" />
                 </tr>
@@ -329,7 +331,7 @@ export default function CreateInvoicePage({ onSuccess, onCancel }: Props) {
                     <td className="px-3 py-2">
                       <Select onValueChange={(v) => selectService(idx, v)}>
                         <SelectTrigger className="w-36 h-8 text-xs">
-                          <SelectValue placeholder="Pilih..." />
+                          <SelectValue placeholder="Select..." />
                         </SelectTrigger>
                         <SelectContent>
                           {(services ?? []).map((s) => (
@@ -363,7 +365,7 @@ export default function CreateInvoicePage({ onSuccess, onCancel }: Props) {
                         onChange={(e) =>
                           updateRow(idx, "description", e.target.value)
                         }
-                        placeholder="Keterangan"
+                        placeholder="Description"
                         className="w-44 h-8 text-xs"
                       />
                     </td>
@@ -427,7 +429,9 @@ export default function CreateInvoicePage({ onSuccess, onCancel }: Props) {
           <div className="max-w-xs ml-auto space-y-3">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Subtotal</span>
-              <span className="font-medium">{formatRupiah(subtotal)}</span>
+              <span className="font-medium text-foreground">
+                {formatRupiah(subtotal)}
+              </span>
             </div>
             <div className="flex items-center justify-between text-sm gap-4">
               <span className="text-muted-foreground whitespace-nowrap">
@@ -442,7 +446,7 @@ export default function CreateInvoicePage({ onSuccess, onCancel }: Props) {
               />
             </div>
             <div className="flex items-center justify-between text-sm gap-4">
-              <span className="text-muted-foreground">Deposit</span>
+              <span className="text-muted-foreground">Deposit / Deduction</span>
               <Input
                 type="number"
                 data-ocid="invoice.deposit.input"
@@ -452,7 +456,7 @@ export default function CreateInvoicePage({ onSuccess, onCancel }: Props) {
               />
             </div>
             <div className="border-t border-border pt-3 flex justify-between font-bold">
-              <span>Total Tagihan</span>
+              <span>Total Bill</span>
               <span className="text-primary text-lg font-display">
                 {formatRupiah(Math.max(0, totalBill))}
               </span>
@@ -468,14 +472,14 @@ export default function CreateInvoicePage({ onSuccess, onCancel }: Props) {
           variant="outline"
           onClick={onCancel}
         >
-          Batal
+          Cancel
         </Button>
         <Button
           data-ocid="invoice.submit_button"
           onClick={handleSubmit}
           disabled={createMutation.isPending}
         >
-          {createMutation.isPending ? "Menyimpan..." : "Simpan Invoice"}
+          {createMutation.isPending ? "Saving..." : "Save Invoice"}
         </Button>
       </div>
     </div>

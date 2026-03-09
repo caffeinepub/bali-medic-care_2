@@ -90,7 +90,7 @@ export default function SuratSehatPage({ onPrint }: Props) {
 
   const handleSubmit = async () => {
     if (!form.patientId || !form.doctorId || !form.purpose) {
-      toast.error("Pasien, dokter, dan keperluan wajib diisi");
+      toast.error("Patient, doctor, and purpose are required");
       return;
     }
     try {
@@ -105,10 +105,10 @@ export default function SuratSehatPage({ onPrint }: Props) {
         weight: BigInt(Number.parseInt(form.weight) || 0),
         height: BigInt(Number.parseInt(form.height) || 0),
       });
-      toast.success("Surat Keterangan Sehat dibuat");
+      toast.success("Health Certificate created");
       setFormOpen(false);
     } catch {
-      toast.error("Gagal membuat surat keterangan sehat");
+      toast.error("Failed to create health certificate");
     }
   };
 
@@ -116,10 +116,10 @@ export default function SuratSehatPage({ onPrint }: Props) {
     if (!deleteId) return;
     try {
       await deleteMutation.mutateAsync(deleteId);
-      toast.success("Surat dihapus");
+      toast.success("Document deleted");
       setDeleteId(null);
     } catch {
-      toast.error("Gagal menghapus surat");
+      toast.error("Failed to delete document");
     }
   };
 
@@ -128,10 +128,10 @@ export default function SuratSehatPage({ onPrint }: Props) {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display text-2xl font-bold text-foreground">
-            Surat Keterangan Sehat
+            Health Certificates
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Kelola surat keterangan sehat pasien
+            Manage patient health certificates
           </p>
         </div>
         <Button
@@ -140,7 +140,7 @@ export default function SuratSehatPage({ onPrint }: Props) {
           className="gap-2"
         >
           <Plus className="w-4 h-4" />
-          Buat Surat
+          New Certificate
         </Button>
       </div>
 
@@ -157,7 +157,7 @@ export default function SuratSehatPage({ onPrint }: Props) {
               data-ocid="surat-sehat.empty_state"
               className="text-center py-12 text-muted-foreground"
             >
-              <p className="text-sm">Belum ada surat keterangan sehat</p>
+              <p className="text-sm">No health certificates yet</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -165,19 +165,19 @@ export default function SuratSehatPage({ onPrint }: Props) {
                 <thead>
                   <tr className="border-b border-border bg-muted/30">
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                      Pasien
+                      Patient
                     </th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide hidden sm:table-cell">
-                      Dokter
+                      Doctor
                     </th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide hidden md:table-cell">
-                      Keperluan
+                      Purpose
                     </th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                      Tgl Terbit
+                      Issued Date
                     </th>
                     <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                      Aksi
+                      Actions
                     </th>
                   </tr>
                 </thead>
@@ -242,12 +242,12 @@ export default function SuratSehatPage({ onPrint }: Props) {
         <DialogContent className="sm:max-w-lg" data-ocid="surat-sehat.dialog">
           <DialogHeader>
             <DialogTitle className="font-display">
-              Buat Surat Keterangan Sehat
+              Create Health Certificate
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2 max-h-[60vh] overflow-y-auto pr-2">
             <div>
-              <Label>Pasien *</Label>
+              <Label>Patient *</Label>
               <Select
                 value={form.patientId}
                 onValueChange={(v) => setForm((f) => ({ ...f, patientId: v }))}
@@ -256,7 +256,7 @@ export default function SuratSehatPage({ onPrint }: Props) {
                   data-ocid="surat-sehat.patient.select"
                   className="mt-1"
                 >
-                  <SelectValue placeholder="Pilih pasien" />
+                  <SelectValue placeholder="Select patient" />
                 </SelectTrigger>
                 <SelectContent>
                   {(patients ?? []).map((p) => (
@@ -268,7 +268,7 @@ export default function SuratSehatPage({ onPrint }: Props) {
               </Select>
             </div>
             <div>
-              <Label>Dokter *</Label>
+              <Label>Doctor *</Label>
               <Select
                 value={form.doctorId}
                 onValueChange={(v) => setForm((f) => ({ ...f, doctorId: v }))}
@@ -277,7 +277,7 @@ export default function SuratSehatPage({ onPrint }: Props) {
                   data-ocid="surat-sehat.doctor.select"
                   className="mt-1"
                 >
-                  <SelectValue placeholder="Pilih dokter" />
+                  <SelectValue placeholder="Select doctor" />
                 </SelectTrigger>
                 <SelectContent>
                   {(doctors ?? []).map((d) => (
@@ -289,7 +289,7 @@ export default function SuratSehatPage({ onPrint }: Props) {
               </Select>
             </div>
             <div>
-              <Label htmlFor="purpose">Keperluan *</Label>
+              <Label htmlFor="purpose">Purpose *</Label>
               <Input
                 id="purpose"
                 data-ocid="surat-sehat.purpose.input"
@@ -297,13 +297,13 @@ export default function SuratSehatPage({ onPrint }: Props) {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, purpose: e.target.value }))
                 }
-                placeholder="Misal: Keperluan kerja, CPNS, dll"
+                placeholder="e.g. Employment, civil service exam, etc."
                 className="mt-1"
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="bp">Tekanan Darah</Label>
+                <Label htmlFor="bp">Blood Pressure</Label>
                 <Input
                   id="bp"
                   data-ocid="surat-sehat.blood_pressure.input"
@@ -316,7 +316,7 @@ export default function SuratSehatPage({ onPrint }: Props) {
                 />
               </div>
               <div>
-                <Label htmlFor="pulse">Nadi (bpm)</Label>
+                <Label htmlFor="pulse">Pulse (bpm)</Label>
                 <Input
                   id="pulse"
                   type="number"
@@ -330,7 +330,7 @@ export default function SuratSehatPage({ onPrint }: Props) {
                 />
               </div>
               <div>
-                <Label htmlFor="weight">Berat Badan (kg)</Label>
+                <Label htmlFor="weight">Weight (kg)</Label>
                 <Input
                   id="weight"
                   type="number"
@@ -344,7 +344,7 @@ export default function SuratSehatPage({ onPrint }: Props) {
                 />
               </div>
               <div>
-                <Label htmlFor="height">Tinggi Badan (cm)</Label>
+                <Label htmlFor="height">Height (cm)</Label>
                 <Input
                   id="height"
                   type="number"
@@ -359,7 +359,7 @@ export default function SuratSehatPage({ onPrint }: Props) {
               </div>
             </div>
             <div>
-              <Label htmlFor="issuedDate">Tanggal Terbit</Label>
+              <Label htmlFor="issuedDate">Issue Date</Label>
               <Input
                 id="issuedDate"
                 type="date"
@@ -372,7 +372,7 @@ export default function SuratSehatPage({ onPrint }: Props) {
               />
             </div>
             <div>
-              <Label htmlFor="notes">Catatan Tambahan</Label>
+              <Label htmlFor="notes">Additional Notes</Label>
               <Textarea
                 id="notes"
                 data-ocid="surat-sehat.textarea"
@@ -380,7 +380,7 @@ export default function SuratSehatPage({ onPrint }: Props) {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, notes: e.target.value }))
                 }
-                placeholder="Catatan tambahan (opsional)"
+                placeholder="Additional notes (optional)"
                 className="mt-1"
                 rows={3}
               />
@@ -392,14 +392,14 @@ export default function SuratSehatPage({ onPrint }: Props) {
               variant="outline"
               onClick={() => setFormOpen(false)}
             >
-              Batal
+              Cancel
             </Button>
             <Button
               data-ocid="surat-sehat.submit_button"
               onClick={handleSubmit}
               disabled={createMutation.isPending}
             >
-              {createMutation.isPending ? "Menyimpan..." : "Buat Surat"}
+              {createMutation.isPending ? "Saving..." : "Create Certificate"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -409,21 +409,21 @@ export default function SuratSehatPage({ onPrint }: Props) {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent data-ocid="surat-sehat.delete.dialog">
           <AlertDialogHeader>
-            <AlertDialogTitle>Hapus Surat Keterangan Sehat?</AlertDialogTitle>
+            <AlertDialogTitle>Delete Health Certificate?</AlertDialogTitle>
             <AlertDialogDescription>
-              Surat akan dihapus permanen.
+              The document will be permanently deleted.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel data-ocid="surat-sehat.cancel_button">
-              Batal
+              Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               data-ocid="surat-sehat.confirm_button"
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Hapus
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

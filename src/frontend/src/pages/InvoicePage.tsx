@@ -54,10 +54,10 @@ export default function InvoicePage({ onCreateNew, onPrint }: Props) {
     if (!deleteId) return;
     try {
       await deleteMutation.mutateAsync(deleteId);
-      toast.success("Invoice dihapus");
+      toast.success("Invoice deleted");
       setDeleteId(null);
     } catch {
-      toast.error("Gagal menghapus invoice");
+      toast.error("Failed to delete invoice");
     }
   };
 
@@ -69,7 +69,7 @@ export default function InvoicePage({ onCreateNew, onPrint }: Props) {
             Invoice
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Proforma Invoice Klinik
+            Clinic Proforma Invoice
           </p>
         </div>
         <Button
@@ -78,7 +78,7 @@ export default function InvoicePage({ onCreateNew, onPrint }: Props) {
           className="gap-2"
         >
           <Plus className="w-4 h-4" />
-          Buat Invoice
+          New Invoice
         </Button>
       </div>
 
@@ -87,7 +87,7 @@ export default function InvoicePage({ onCreateNew, onPrint }: Props) {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           data-ocid="invoice.search_input"
-          placeholder="Cari nama pasien atau nomor registrasi..."
+          placeholder="Search by patient name or registration number..."
           className="pl-9"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -118,7 +118,7 @@ export default function InvoicePage({ onCreateNew, onPrint }: Props) {
             >
               <FileText className="w-10 h-10 mb-3 opacity-30" />
               <p className="text-sm">
-                {search ? "Invoice tidak ditemukan" : "Belum ada invoice"}
+                {search ? "No invoices found" : "No invoices yet"}
               </p>
               {!search && (
                 <Button
@@ -129,7 +129,7 @@ export default function InvoicePage({ onCreateNew, onPrint }: Props) {
                   onClick={onCreateNew}
                 >
                   <Plus className="w-4 h-4" />
-                  Buat Invoice Pertama
+                  Create First Invoice
                 </Button>
               )}
             </div>
@@ -139,13 +139,13 @@ export default function InvoicePage({ onCreateNew, onPrint }: Props) {
                 <thead>
                   <tr className="border-b border-border bg-muted/30">
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                      No. Reg
+                      Reg No.
                     </th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                      Pasien
+                      Patient
                     </th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide hidden md:table-cell">
-                      Tanggal
+                      Date
                     </th>
                     <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                       Total
@@ -154,7 +154,7 @@ export default function InvoicePage({ onCreateNew, onPrint }: Props) {
                       Status
                     </th>
                     <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                      Aksi
+                      Actions
                     </th>
                   </tr>
                 </thead>
@@ -232,21 +232,21 @@ export default function InvoicePage({ onCreateNew, onPrint }: Props) {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent data-ocid="invoice.delete.dialog">
           <AlertDialogHeader>
-            <AlertDialogTitle>Hapus Invoice?</AlertDialogTitle>
+            <AlertDialogTitle>Delete Invoice?</AlertDialogTitle>
             <AlertDialogDescription>
-              Invoice akan dihapus permanen dan tidak dapat dikembalikan.
+              This invoice will be permanently deleted and cannot be recovered.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel data-ocid="invoice.cancel_button">
-              Batal
+              Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               data-ocid="invoice.confirm_button"
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Hapus
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
