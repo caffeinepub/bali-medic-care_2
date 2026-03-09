@@ -64,7 +64,7 @@ export default function PrintInvoicePage({ invoiceId, onBack }: Props) {
       </div>
 
       {/* Invoice document — A4 width */}
-      <div className="print-container max-w-[794px] mx-auto my-8 bg-white shadow-lg px-12 py-10 print:shadow-none print:my-0 print:px-0 print:py-0">
+      <div className="print-container max-w-[794px] mx-auto my-8 bg-white shadow-lg px-12 py-10 print:shadow-none print:my-0">
         {/* Header */}
         <div className="border-b-2 border-gray-800 pb-4 mb-6">
           {logo ? (
@@ -225,7 +225,7 @@ export default function PrintInvoicePage({ invoiceId, onBack }: Props) {
             <p className="mb-1">Examining Doctor,</p>
 
             {/* Merged signature + stamp overlay */}
-            <div className="relative inline-flex items-center justify-center h-24 w-56 mt-1">
+            <div className="relative inline-flex items-center justify-center h-32 w-72 mt-1">
               {signature && (
                 <img
                   src={signature}

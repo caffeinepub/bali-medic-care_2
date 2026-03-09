@@ -64,7 +64,7 @@ export default function PrintSuratSakitPage({ noteId, onBack }: Props) {
       </div>
 
       {/* Letter document — A4 width */}
-      <div className="print-container max-w-[794px] mx-auto my-8 bg-white shadow-lg px-12 py-10 print:shadow-none print:my-0 print:px-0 print:py-0">
+      <div className="print-container max-w-[794px] mx-auto my-8 bg-white shadow-lg px-12 py-10 print:shadow-none print:my-0">
         {/* Kop Surat */}
         <div className="border-b-4 border-double border-gray-800 pb-4 mb-8">
           {logo ? (
@@ -167,7 +167,7 @@ export default function PrintSuratSakitPage({ noteId, onBack }: Props) {
             <p className="text-sm text-gray-700 mt-1">Examining Doctor,</p>
 
             {/* Merged signature + stamp overlay */}
-            <div className="relative inline-flex items-center justify-center mt-2 h-24 w-56">
+            <div className="relative inline-flex items-center justify-center mt-2 h-32 w-72">
               {signature && (
                 <img
                   src={signature}

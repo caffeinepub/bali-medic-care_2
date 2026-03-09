@@ -305,15 +305,7 @@ export default function DashboardPage({ navigate }: Props) {
 
       {/* Footer */}
       <footer className="text-center py-4 text-xs text-muted-foreground border-t border-border">
-        © {new Date().getFullYear()}. Built with ❤️ using{" "}
-        <a
-          href={`https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(window.location.hostname)}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline hover:text-foreground"
-        >
-          caffeine.ai
-        </a>
+        © 2026. Built with Lingga
       </footer>
     </div>
   );

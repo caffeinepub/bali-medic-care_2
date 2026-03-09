@@ -1,23 +1,24 @@
 import { Toaster } from "@/components/ui/sonner";
-import { useState } from "react";
+import { Suspense, lazy, useState } from "react";
 import AppLayout from "./components/AppLayout";
 import { useActor } from "./hooks/useActor";
 import { useInternetIdentity } from "./hooks/useInternetIdentity";
 import { useGetCallerUserRole } from "./hooks/useQueries";
-import CreateInvoicePage from "./pages/CreateInvoicePage";
-import DashboardPage from "./pages/DashboardPage";
-import DokterPage from "./pages/DokterPage";
-import InvoicePage from "./pages/InvoicePage";
-import KatalogLayananPage from "./pages/KatalogLayananPage";
-import LoginPage from "./pages/LoginPage";
-import PasienPage from "./pages/PasienPage";
-import PendingApprovalPage from "./pages/PendingApprovalPage";
-import PengaturanPage from "./pages/PengaturanPage";
-import PrintInvoicePage from "./pages/PrintInvoicePage";
-import PrintSuratSakitPage from "./pages/PrintSuratSakitPage";
-import PrintSuratSehatPage from "./pages/PrintSuratSehatPage";
-import SuratSakitPage from "./pages/SuratSakitPage";
-import SuratSehatPage from "./pages/SuratSehatPage";
+
+const CreateInvoicePage = lazy(() => import("./pages/CreateInvoicePage"));
+const DashboardPage = lazy(() => import("./pages/DashboardPage"));
+const DokterPage = lazy(() => import("./pages/DokterPage"));
+const InvoicePage = lazy(() => import("./pages/InvoicePage"));
+const KatalogLayananPage = lazy(() => import("./pages/KatalogLayananPage"));
+const LoginPage = lazy(() => import("./pages/LoginPage"));
+const PasienPage = lazy(() => import("./pages/PasienPage"));
+const PendingApprovalPage = lazy(() => import("./pages/PendingApprovalPage"));
+const PengaturanPage = lazy(() => import("./pages/PengaturanPage"));
+const PrintInvoicePage = lazy(() => import("./pages/PrintInvoicePage"));
+const PrintSuratSakitPage = lazy(() => import("./pages/PrintSuratSakitPage"));
+const PrintSuratSehatPage = lazy(() => import("./pages/PrintSuratSehatPage"));
+const SuratSakitPage = lazy(() => import("./pages/SuratSakitPage"));
+const SuratSehatPage = lazy(() => import("./pages/SuratSehatPage"));
 
 export type Page =
   | "dashboard"
@@ -32,6 +33,17 @@ export type Page =
   | "print-invoice"
   | "print-surat-sakit"
   | "print-surat-sehat";
+
+function PageLoader() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+        <p className="text-muted-foreground text-sm font-sans">Loading...</p>
+      </div>
+    </div>
+  );
+}
 
 export default function App() {
   const { identity, isInitializing } = useInternetIdentity();
@@ -62,7 +74,9 @@ export default function App() {
   if (!identity) {
     return (
       <>
-        <LoginPage />
+        <Suspense fallback={<PageLoader />}>
+          <LoginPage />
+        </Suspense>
         <Toaster />
       </>
     );
@@ -86,7 +100,9 @@ export default function App() {
   if (role === "guest") {
     return (
       <>
-        <PendingApprovalPage />
+        <Suspense fallback={<PageLoader />}>
+          <PendingApprovalPage />
+        </Suspense>
         <Toaster />
       </>
     );
@@ -96,10 +112,12 @@ export default function App() {
   if (currentPage === "print-invoice" && printId !== null) {
     return (
       <>
-        <PrintInvoicePage
-          invoiceId={printId}
-          onBack={() => navigate("invoice")}
-        />
+        <Suspense fallback={<PageLoader />}>
+          <PrintInvoicePage
+            invoiceId={printId}
+            onBack={() => navigate("invoice")}
+          />
+        </Suspense>
         <Toaster />
       </>
     );
@@ -107,10 +125,12 @@ export default function App() {
   if (currentPage === "print-surat-sakit" && printId !== null) {
     return (
       <>
-        <PrintSuratSakitPage
-          noteId={printId}
-          onBack={() => navigate("surat-sakit")}
-        />
+        <Suspense fallback={<PageLoader />}>
+          <PrintSuratSakitPage
+            noteId={printId}
+            onBack={() => navigate("surat-sakit")}
+          />
+        </Suspense>
         <Toaster />
       </>
     );
@@ -118,10 +138,12 @@ export default function App() {
   if (currentPage === "print-surat-sehat" && printId !== null) {
     return (
       <>
-        <PrintSuratSehatPage
-          certId={printId}
-          onBack={() => navigate("surat-sehat")}
-        />
+        <Suspense fallback={<PageLoader />}>
+          <PrintSuratSehatPage
+            certId={printId}
+            onBack={() => navigate("surat-sehat")}
+          />
+        </Suspense>
         <Toaster />
       </>
     );
@@ -174,7 +196,7 @@ export default function App() {
         navigate={navigate}
         userRole={role ?? "user"}
       >
-        {renderPage()}
+        <Suspense fallback={<PageLoader />}>{renderPage()}</Suspense>
       </AppLayout>
       <Toaster />
     </>
