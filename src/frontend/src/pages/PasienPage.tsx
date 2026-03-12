@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -28,10 +28,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Search, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Gender } from "../backend.d";
+import { useActor } from "../hooks/useActor";
 import {
   useCreatePatient,
   useDeletePatient,
@@ -45,12 +47,61 @@ import {
   nanosToDateInput,
 } from "../utils/formatters";
 
+const COUNTRIES = [
+  "Indonesia",
+  "Malaysia",
+  "Singapore",
+  "Thailand",
+  "Philippines",
+  "Vietnam",
+  "Myanmar",
+  "Cambodia",
+  "Laos",
+  "Brunei",
+  "Australia",
+  "China",
+  "Japan",
+  "South Korea",
+  "India",
+  "United States",
+  "United Kingdom",
+  "Germany",
+  "France",
+  "Netherlands",
+  "Russia",
+  "Saudi Arabia",
+  "UAE",
+  "Canada",
+  "New Zealand",
+  "Taiwan",
+  "Hong Kong",
+  "Bangladesh",
+  "Pakistan",
+  "Sri Lanka",
+  "Other",
+];
+
+function getPatientCountries(): Record<string, string> {
+  try {
+    return JSON.parse(localStorage.getItem("patientCountry") || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function setPatientCountry(id: bigint, country: string) {
+  const map = getPatientCountries();
+  map[String(id)] = country;
+  localStorage.setItem("patientCountry", JSON.stringify(map));
+}
+
 interface PatientForm {
   name: string;
   dateOfBirth: string;
   gender: "male" | "female" | "other";
   address: string;
   phone: string;
+  country: string;
 }
 
 const emptyForm: PatientForm = {
@@ -59,6 +110,7 @@ const emptyForm: PatientForm = {
   gender: "male",
   address: "",
   phone: "",
+  country: "",
 };
 
 export default function PasienPage() {
@@ -66,6 +118,8 @@ export default function PasienPage() {
   const createMutation = useCreatePatient();
   const updateMutation = useUpdatePatient();
   const deleteMutation = useDeletePatient();
+  const queryClient = useQueryClient();
+  const { actor } = useActor();
 
   const [search, setSearch] = useState("");
   const [formOpen, setFormOpen] = useState(false);
@@ -73,12 +127,17 @@ export default function PasienPage() {
   const [deleteId, setDeleteId] = useState<bigint | null>(null);
   const [form, setForm] = useState<PatientForm>(emptyForm);
 
-  const filtered = (patients ?? []).filter(
-    (p) =>
+  const countryMap = getPatientCountries();
+
+  const filtered = (patients ?? []).filter((p) => {
+    const country = countryMap[String(p.id)] || "";
+    return (
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.patientNo.toLowerCase().includes(search.toLowerCase()) ||
-      p.phone.includes(search),
-  );
+      p.phone.includes(search) ||
+      country.toLowerCase().includes(search.toLowerCase())
+    );
+  });
 
   const openCreate = () => {
     setEditPatient(null);
@@ -94,6 +153,7 @@ export default function PasienPage() {
       gender: p.gender as "male" | "female" | "other",
       address: p.address,
       phone: p.phone,
+      country: getPatientCountries()[String(p.id)] || "",
     });
     setFormOpen(true);
   };
@@ -119,6 +179,9 @@ export default function PasienPage() {
           address: form.address,
           phone: form.phone,
         });
+        if (form.country) {
+          setPatientCountry(editPatient.id, form.country);
+        }
         toast.success("Patient updated");
       } else {
         await createMutation.mutateAsync({
@@ -128,6 +191,21 @@ export default function PasienPage() {
           address: form.address,
           phone: form.phone,
         });
+        // Find the newly created patient by fetching fresh data
+        if (form.country && actor) {
+          try {
+            const updated = await queryClient.fetchQuery({
+              queryKey: ["patients"],
+              queryFn: async () => actor.getPatients(),
+            });
+            const newP = [...(updated as Patient[])]
+              .sort((a, b) => Number(b.createdAt - a.createdAt))
+              .find((p) => p.name === form.name);
+            if (newP) setPatientCountry(newP.id, form.country);
+          } catch {
+            // best effort
+          }
+        }
         toast.success("New patient added");
       }
       setFormOpen(false);
@@ -175,7 +253,7 @@ export default function PasienPage() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           data-ocid="pasien.search_input"
-          placeholder="Search by name, patient number, or phone..."
+          placeholder="Search by name, patient number, phone, or country..."
           className="pl-9"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -229,68 +307,79 @@ export default function PasienPage() {
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide hidden lg:table-cell">
                       Phone
                     </th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide hidden lg:table-cell">
+                      Country
+                    </th>
                     <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                       Actions
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((p, idx) => (
-                    <tr
-                      key={String(p.id)}
-                      data-ocid={`pasien.row.${idx + 1}`}
-                      className="border-b border-border last:border-0 hover:bg-muted/20 transition-colors"
-                    >
-                      <td className="px-4 py-3">
-                        <span className="font-mono text-xs bg-secondary text-secondary-foreground px-1.5 py-0.5 rounded">
-                          {p.patientNo}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 font-medium">{p.name}</td>
-                      <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">
-                        {formatDate(p.dateOfBirth)}
-                      </td>
-                      <td className="px-4 py-3 hidden sm:table-cell">
-                        <Badge
-                          variant={
-                            p.gender === "male" ? "default" : "secondary"
-                          }
-                          className="text-xs"
-                        >
-                          {p.gender === "male"
-                            ? "Male"
-                            : p.gender === "female"
-                              ? "Female"
-                              : "Other"}
-                        </Badge>
-                      </td>
-                      <td className="px-4 py-3 text-muted-foreground hidden lg:table-cell">
-                        {p.phone}
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button
-                            data-ocid={`pasien.edit_button.${idx + 1}`}
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => openEdit(p)}
-                            className="h-8 w-8 p-0"
+                  {filtered.map((p, idx) => {
+                    const country = countryMap[String(p.id)] || "";
+                    return (
+                      <tr
+                        key={String(p.id)}
+                        data-ocid={`pasien.row.${idx + 1}`}
+                        className="border-b border-border last:border-0 hover:bg-muted/20 transition-colors"
+                      >
+                        <td className="px-4 py-3">
+                          <span className="font-mono text-xs bg-secondary text-secondary-foreground px-1.5 py-0.5 rounded">
+                            {p.patientNo}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 font-medium">{p.name}</td>
+                        <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">
+                          {formatDate(p.dateOfBirth)}
+                        </td>
+                        <td className="px-4 py-3 hidden sm:table-cell">
+                          <Badge
+                            variant={
+                              p.gender === "male" ? "default" : "secondary"
+                            }
+                            className="text-xs"
                           >
-                            <Pencil className="w-3.5 h-3.5" />
-                          </Button>
-                          <Button
-                            data-ocid={`pasien.delete_button.${idx + 1}`}
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setDeleteId(p.id)}
-                            className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                            {p.gender === "male"
+                              ? "Male"
+                              : p.gender === "female"
+                                ? "Female"
+                                : "Other"}
+                          </Badge>
+                        </td>
+                        <td className="px-4 py-3 text-muted-foreground hidden lg:table-cell">
+                          {p.phone}
+                        </td>
+                        <td className="px-4 py-3 text-muted-foreground hidden lg:table-cell">
+                          {country || (
+                            <span className="text-muted-foreground/50">—</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center justify-end gap-2">
+                            <Button
+                              data-ocid={`pasien.edit_button.${idx + 1}`}
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => openEdit(p)}
+                              className="h-8 w-8 p-0"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                            </Button>
+                            <Button
+                              data-ocid={`pasien.delete_button.${idx + 1}`}
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setDeleteId(p.id)}
+                              className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -382,6 +471,27 @@ export default function PasienPage() {
                 placeholder="Phone number"
                 className="mt-1"
               />
+            </div>
+            <div>
+              <Label>Country</Label>
+              <Select
+                value={form.country}
+                onValueChange={(v) => setForm((f) => ({ ...f, country: v }))}
+              >
+                <SelectTrigger
+                  data-ocid="pasien.country.select"
+                  className="mt-1"
+                >
+                  <SelectValue placeholder="Select country" />
+                </SelectTrigger>
+                <SelectContent>
+                  {COUNTRIES.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <DialogFooter>
