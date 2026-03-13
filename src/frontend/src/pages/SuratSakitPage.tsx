@@ -28,7 +28,8 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Printer, Trash2 } from "lucide-react";
+import { exportToExcel } from "@/lib/exportExcel";
+import { FileSpreadsheet, Plus, Printer, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -132,14 +133,44 @@ export default function SuratSakitPage({ onPrint }: Props) {
             Manage patient sick notes
           </p>
         </div>
-        <Button
-          data-ocid="surat-sakit.open_modal_button"
-          onClick={openCreate}
-          className="gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          New Sick Note
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            data-ocid="sick-certificates.export_button"
+            variant="outline"
+            onClick={() => {
+              const rows = (notes ?? []).map((n) => {
+                const patient = patients?.find((p) => p.id === n.patientId);
+                const doctor = doctors?.find((dd) => dd.id === n.doctorId);
+                return {
+                  Patient: patient?.name ?? String(n.patientId),
+                  Doctor: doctor?.name ?? String(n.doctorId),
+                  Diagnosis: n.diagnosis,
+                  "Start Date": new Date(
+                    Number(n.startDate / BigInt(1_000_000)),
+                  ).toLocaleDateString(),
+                  "End Date": new Date(
+                    Number(n.endDate / BigInt(1_000_000)),
+                  ).toLocaleDateString(),
+                  "Rest Days": Number(n.restDays),
+                  Notes: n.notes,
+                };
+              });
+              exportToExcel(rows, "sick-certificates");
+            }}
+            className="gap-2"
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            Export
+          </Button>
+          <Button
+            data-ocid="surat-sakit.open_modal_button"
+            onClick={openCreate}
+            className="gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            New Sick Note
+          </Button>
+        </div>
       </div>
 
       <Card className="shadow-card">

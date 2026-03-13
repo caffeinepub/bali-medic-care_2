@@ -20,16 +20,16 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Pencil, Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { exportToExcel } from "@/lib/exportExcel";
+import {
+  FileSpreadsheet,
+  FolderPlus,
+  Pencil,
+  Plus,
+  Trash2,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   useCreateService,
@@ -40,13 +40,18 @@ import {
 import type { ServiceCatalog } from "../hooks/useQueries";
 import { formatRupiah } from "../utils/formatters";
 
-const CATEGORIES = [
+const DEFAULT_CATEGORIES = [
   "TINDAKAN",
   "OBAT",
   "LABORATORIUM",
   "KONSULTASI",
   "LAINNYA",
 ];
+
+interface CustomCategory {
+  name: string;
+  defaultPrice: number;
+}
 
 interface ServiceForm {
   name: string;
@@ -56,7 +61,7 @@ interface ServiceForm {
 
 const emptyForm: ServiceForm = {
   name: "",
-  category: "TINDAKAN",
+  category: "",
   basePrice: "",
 };
 
@@ -68,6 +73,19 @@ const categoryColors: Record<string, string> = {
   LAINNYA: "bg-gray-100 text-gray-700",
 };
 
+function loadCustomCategories(): CustomCategory[] {
+  try {
+    const raw = localStorage.getItem("customCategories");
+    return raw ? (JSON.parse(raw) as CustomCategory[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveCustomCategories(cats: CustomCategory[]) {
+  localStorage.setItem("customCategories", JSON.stringify(cats));
+}
+
 export default function KatalogLayananPage() {
   const { data: services, isLoading } = useGetServices();
   const createMutation = useCreateService();
@@ -78,6 +96,42 @@ export default function KatalogLayananPage() {
   const [editService, setEditService] = useState<ServiceCatalog | null>(null);
   const [deleteId, setDeleteId] = useState<bigint | null>(null);
   const [form, setForm] = useState<ServiceForm>(emptyForm);
+
+  // Custom categories
+  const [customCategories, setCustomCategories] =
+    useState<CustomCategory[]>(loadCustomCategories);
+  const [catDialogOpen, setCatDialogOpen] = useState(false);
+  const [catForm, setCatForm] = useState({ name: "", defaultPrice: "" });
+  const [showCatDropdown, setShowCatDropdown] = useState(false);
+  const catInputRef = useRef<HTMLInputElement>(null);
+  const catDropdownRef = useRef<HTMLDivElement>(null);
+
+  const allCategories = [
+    ...DEFAULT_CATEGORIES.map((name) => ({ name, defaultPrice: 0 })),
+    ...customCategories,
+  ];
+
+  const filteredCatSuggestions = form.category
+    ? allCategories.filter((c) =>
+        c.name.toLowerCase().includes(form.category.toLowerCase()),
+      )
+    : allCategories;
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (
+        catDropdownRef.current &&
+        !catDropdownRef.current.contains(e.target as Node) &&
+        catInputRef.current &&
+        !catInputRef.current.contains(e.target as Node)
+      ) {
+        setShowCatDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   const openCreate = () => {
     setEditService(null);
@@ -95,6 +149,18 @@ export default function KatalogLayananPage() {
     setFormOpen(true);
   };
 
+  const handleCategorySelect = (cat: CustomCategory) => {
+    setForm((f) => ({
+      ...f,
+      category: cat.name,
+      basePrice:
+        cat.defaultPrice > 0 && !f.basePrice
+          ? String(cat.defaultPrice)
+          : f.basePrice,
+    }));
+    setShowCatDropdown(false);
+  };
+
   const handleSubmit = async () => {
     if (!form.name || !form.basePrice) {
       toast.error("Name and price are required");
@@ -110,14 +176,14 @@ export default function KatalogLayananPage() {
         await updateMutation.mutateAsync({
           id: editService.id,
           name: form.name,
-          category: form.category,
+          category: form.category || "LAINNYA",
           basePrice: price,
         });
         toast.success("Service updated");
       } else {
         await createMutation.mutateAsync({
           name: form.name,
-          category: form.category,
+          category: form.category || "LAINNYA",
           basePrice: price,
         });
         toast.success("New service added");
@@ -139,11 +205,34 @@ export default function KatalogLayananPage() {
     }
   };
 
+  const handleSaveCategory = () => {
+    const name = catForm.name.trim().toUpperCase();
+    if (!name) {
+      toast.error("Category name is required");
+      return;
+    }
+    const already = allCategories.some((c) => c.name === name);
+    if (already) {
+      toast.error("Category already exists");
+      return;
+    }
+    const newCat: CustomCategory = {
+      name,
+      defaultPrice: Number(catForm.defaultPrice) || 0,
+    };
+    const updated = [...customCategories, newCat];
+    setCustomCategories(updated);
+    saveCustomCategories(updated);
+    setCatForm({ name: "", defaultPrice: "" });
+    setCatDialogOpen(false);
+    toast.success(`Category "${name}" added`);
+  };
+
   const isPending = createMutation.isPending || updateMutation.isPending;
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
           <h1 className="font-display text-2xl font-bold text-foreground">
             Service Catalog
@@ -152,15 +241,67 @@ export default function KatalogLayananPage() {
             Manage clinic services and procedures
           </p>
         </div>
-        <Button
-          data-ocid="katalog.open_modal_button"
-          onClick={openCreate}
-          className="gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          Add Service
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            data-ocid="katalog.category.open_modal_button"
+            variant="outline"
+            onClick={() => {
+              setCatForm({ name: "", defaultPrice: "" });
+              setCatDialogOpen(true);
+            }}
+            className="gap-2"
+          >
+            <FolderPlus className="w-4 h-4" />
+            Add Category
+          </Button>
+          <Button
+            data-ocid="service-catalog.export_button"
+            variant="outline"
+            onClick={() => {
+              const rows = (services ?? []).map((s) => ({
+                Name: s.name,
+                Category: s.category,
+                "Base Price (IDR)": Number(s.basePrice),
+              }));
+              exportToExcel(rows, "service-catalog");
+            }}
+            className="gap-2"
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            Export
+          </Button>
+          <Button
+            data-ocid="katalog.open_modal_button"
+            onClick={openCreate}
+            className="gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Add Service
+          </Button>
+        </div>
       </div>
+
+      {/* Custom categories badges */}
+      {customCategories.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          <span className="text-xs text-muted-foreground self-center">
+            Custom categories:
+          </span>
+          {customCategories.map((cat) => (
+            <span
+              key={cat.name}
+              className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-700 font-medium"
+            >
+              {cat.name}
+              {cat.defaultPrice > 0 && (
+                <span className="text-gray-400 font-normal">
+                  {formatRupiah(BigInt(cat.defaultPrice))}
+                </span>
+              )}
+            </span>
+          ))}
+        </div>
+      )}
 
       <Card className="shadow-card">
         <CardContent className="p-0">
@@ -206,7 +347,10 @@ export default function KatalogLayananPage() {
                       <td className="px-4 py-3 font-medium">{s.name}</td>
                       <td className="px-4 py-3 hidden sm:table-cell">
                         <span
-                          className={`text-xs px-2 py-0.5 rounded font-medium ${categoryColors[s.category] ?? "bg-gray-100 text-gray-700"}`}
+                          className={`text-xs px-2 py-0.5 rounded font-medium ${
+                            categoryColors[s.category] ??
+                            "bg-gray-100 text-gray-700"
+                          }`}
                         >
                           {s.category}
                         </span>
@@ -245,7 +389,7 @@ export default function KatalogLayananPage() {
         </CardContent>
       </Card>
 
-      {/* Form Dialog */}
+      {/* Add Service Dialog */}
       <Dialog open={formOpen} onOpenChange={setFormOpen}>
         <DialogContent className="sm:max-w-md" data-ocid="katalog.dialog">
           <DialogHeader>
@@ -268,25 +412,54 @@ export default function KatalogLayananPage() {
               />
             </div>
             <div>
-              <Label>Category</Label>
-              <Select
-                value={form.category}
-                onValueChange={(v) => setForm((f) => ({ ...f, category: v }))}
-              >
-                <SelectTrigger
-                  data-ocid="katalog.category.select"
-                  className="mt-1"
-                >
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {CATEGORIES.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label htmlFor="s-category">Category</Label>
+              <div className="relative mt-1">
+                <Input
+                  id="s-category"
+                  ref={catInputRef}
+                  data-ocid="katalog.category.input"
+                  value={form.category}
+                  onChange={(e) => {
+                    setForm((f) => ({ ...f, category: e.target.value }));
+                    setShowCatDropdown(true);
+                  }}
+                  onFocus={() => setShowCatDropdown(true)}
+                  placeholder="Select or type a category"
+                  autoComplete="off"
+                />
+                {showCatDropdown && filteredCatSuggestions.length > 0 && (
+                  <div
+                    ref={catDropdownRef}
+                    className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-48 overflow-y-auto"
+                  >
+                    {filteredCatSuggestions.map((cat) => (
+                      <button
+                        key={cat.name}
+                        type="button"
+                        className="w-full text-left px-3 py-2 text-sm hover:bg-muted flex items-center justify-between gap-2"
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          handleCategorySelect(cat);
+                        }}
+                      >
+                        <span
+                          className={`text-xs px-2 py-0.5 rounded font-medium ${
+                            categoryColors[cat.name] ??
+                            "bg-gray-100 text-gray-700"
+                          }`}
+                        >
+                          {cat.name}
+                        </span>
+                        {cat.defaultPrice > 0 && (
+                          <span className="text-xs text-muted-foreground">
+                            {formatRupiah(BigInt(cat.defaultPrice))}
+                          </span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
             <div>
               <Label htmlFor="s-price">Base Price (Rp) *</Label>
@@ -322,6 +495,66 @@ export default function KatalogLayananPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Add Category Dialog */}
+      <Dialog open={catDialogOpen} onOpenChange={setCatDialogOpen}>
+        <DialogContent
+          className="sm:max-w-sm"
+          data-ocid="katalog.category.dialog"
+        >
+          <DialogHeader>
+            <DialogTitle className="font-display">Add New Category</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <Label htmlFor="cat-name">Category Name *</Label>
+              <Input
+                id="cat-name"
+                data-ocid="katalog.category.name.input"
+                value={catForm.name}
+                onChange={(e) =>
+                  setCatForm((f) => ({ ...f, name: e.target.value }))
+                }
+                placeholder="e.g. FISIOTERAPI"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="cat-price">Default Price (Rp)</Label>
+              <Input
+                id="cat-price"
+                data-ocid="katalog.category.price.input"
+                type="number"
+                value={catForm.defaultPrice}
+                onChange={(e) =>
+                  setCatForm((f) => ({ ...f, defaultPrice: e.target.value }))
+                }
+                placeholder="0 (optional)"
+                className="mt-1"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                If set, this price will be auto-filled when you select this
+                category for a service.
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              data-ocid="katalog.category.cancel_button"
+              variant="outline"
+              onClick={() => setCatDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              data-ocid="katalog.category.save_button"
+              onClick={handleSaveCategory}
+            >
+              Save Category
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Delete Confirmation */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent data-ocid="katalog.delete.dialog">
@@ -332,7 +565,7 @@ export default function KatalogLayananPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel data-ocid="katalog.cancel_button">
+            <AlertDialogCancel data-ocid="katalog.delete.cancel_button">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction

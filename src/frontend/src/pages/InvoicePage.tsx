@@ -13,7 +13,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { FileText, Plus, Printer, Search, Trash2, X } from "lucide-react";
+import { exportToExcel } from "@/lib/exportExcel";
+import {
+  FileSpreadsheet,
+  FileText,
+  Plus,
+  Printer,
+  Search,
+  Trash2,
+  X,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import type { Page } from "../App";
@@ -72,14 +81,42 @@ export default function InvoicePage({ onCreateNew, onPrint }: Props) {
             Clinic Proforma Invoice
           </p>
         </div>
-        <Button
-          data-ocid="invoice.open_modal_button"
-          onClick={onCreateNew}
-          className="gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          New Invoice
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            data-ocid="invoices.export_button"
+            variant="outline"
+            onClick={() => {
+              const rows = (invoices ?? []).map((invItem) => {
+                const patient = patients?.find(
+                  (p) => p.id === invItem.patientId,
+                );
+                return {
+                  "Reg No": invItem.regNo,
+                  Patient: patient?.name ?? String(invItem.patientId),
+                  Payer: invItem.payer ?? "",
+                  Status: invItem.status,
+                  "Total (IDR)": invItem.lineItems.reduce(
+                    (s, li) => s + Number(li.appliedCharge),
+                    0,
+                  ),
+                };
+              });
+              exportToExcel(rows, "invoices");
+            }}
+            className="gap-2"
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            Export
+          </Button>
+          <Button
+            data-ocid="invoice.open_modal_button"
+            onClick={onCreateNew}
+            className="gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            New Invoice
+          </Button>
+        </div>
       </div>
 
       {/* Search */}

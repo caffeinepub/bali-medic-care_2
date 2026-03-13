@@ -1,5 +1,5 @@
 import { Toaster } from "@/components/ui/sonner";
-import { Suspense, lazy, useState } from "react";
+import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import AppLayout from "./components/AppLayout";
 import { useActor } from "./hooks/useActor";
 import { useInternetIdentity } from "./hooks/useInternetIdentity";
@@ -8,6 +8,7 @@ import { useGetCallerUserRole } from "./hooks/useQueries";
 const CreateInvoicePage = lazy(() => import("./pages/CreateInvoicePage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
 const DokterPage = lazy(() => import("./pages/DokterPage"));
+const EmtPage = lazy(() => import("./pages/EmtPage"));
 const InvoicePage = lazy(() => import("./pages/InvoicePage"));
 const KatalogLayananPage = lazy(() => import("./pages/KatalogLayananPage"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
@@ -17,6 +18,7 @@ const PengaturanPage = lazy(() => import("./pages/PengaturanPage"));
 const PrintInvoicePage = lazy(() => import("./pages/PrintInvoicePage"));
 const PrintSuratSakitPage = lazy(() => import("./pages/PrintSuratSakitPage"));
 const PrintSuratSehatPage = lazy(() => import("./pages/PrintSuratSehatPage"));
+const RekapPage = lazy(() => import("./pages/RekapPage"));
 const SuratSakitPage = lazy(() => import("./pages/SuratSakitPage"));
 const SuratSehatPage = lazy(() => import("./pages/SuratSehatPage"));
 
@@ -24,11 +26,13 @@ export type Page =
   | "dashboard"
   | "pasien"
   | "dokter"
+  | "emt"
   | "invoice"
   | "invoice-create"
   | "surat-sakit"
   | "surat-sehat"
   | "katalog"
+  | "rekap"
   | "pengaturan"
   | "print-invoice"
   | "print-surat-sakit"
@@ -36,20 +40,25 @@ export type Page =
 
 function PageLoader() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="flex-1 flex items-center justify-center min-h-[200px]">
       <div className="flex flex-col items-center gap-3">
-        <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
-        <p className="text-muted-foreground text-sm font-sans">Loading...</p>
+        <div className="w-8 h-8 border-3 border-primary/30 border-t-primary rounded-full animate-spin" />
+        <p className="text-muted-foreground text-sm">Loading...</p>
       </div>
     </div>
   );
 }
 
-export default function App() {
+interface AppProps {
+  onReady?: () => void;
+}
+
+export default function App({ onReady }: AppProps) {
   const { identity, isInitializing } = useInternetIdentity();
   const { isFetching: actorFetching } = useActor();
   const [currentPage, setCurrentPage] = useState<Page>("dashboard");
   const [printId, setPrintId] = useState<bigint | null>(null);
+  const readyCalled = useRef(false);
 
   const roleQuery = useGetCallerUserRole();
 
@@ -58,17 +67,22 @@ export default function App() {
     setCurrentPage(page);
   };
 
-  if (isInitializing) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
-          <p className="text-muted-foreground text-sm font-sans">
-            Loading system...
-          </p>
-        </div>
-      </div>
-    );
+  // Single combined loading state — avoids multiple sequential splash screens
+  const isLoading =
+    isInitializing ||
+    (!identity ? false : actorFetching || roleQuery.isLoading);
+
+  // Signal ready once loading resolves
+  useEffect(() => {
+    if (!isLoading && !readyCalled.current) {
+      readyCalled.current = true;
+      onReady?.();
+    }
+  }, [isLoading, onReady]);
+
+  if (isLoading) {
+    // Keep splash visible — don't render anything that fights it
+    return null;
   }
 
   if (!identity) {
@@ -79,19 +93,6 @@ export default function App() {
         </Suspense>
         <Toaster />
       </>
-    );
-  }
-
-  if (actorFetching || roleQuery.isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
-          <p className="text-muted-foreground text-sm font-sans">
-            Verifying access...
-          </p>
-        </div>
-      </div>
     );
   }
 
@@ -157,6 +158,8 @@ export default function App() {
         return <PasienPage />;
       case "dokter":
         return <DokterPage />;
+      case "emt":
+        return <EmtPage />;
       case "invoice":
         return (
           <InvoicePage
@@ -182,6 +185,8 @@ export default function App() {
         );
       case "katalog":
         return <KatalogLayananPage />;
+      case "rekap":
+        return <RekapPage />;
       case "pengaturan":
         return <PengaturanPage />;
       default:

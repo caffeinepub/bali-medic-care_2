@@ -12,6 +12,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
   Dialog,
   DialogContent,
   DialogFooter,
@@ -21,6 +29,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -28,8 +41,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { exportToExcel } from "@/lib/exportExcel";
+import { cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
-import { Pencil, Plus, Search, Trash2, X } from "lucide-react";
+import {
+  Check,
+  ChevronsUpDown,
+  FileSpreadsheet,
+  Pencil,
+  Plus,
+  Search,
+  Trash2,
+  X,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Gender } from "../backend.d";
@@ -49,35 +73,201 @@ import {
 
 const COUNTRIES = [
   "Indonesia",
-  "Malaysia",
-  "Singapore",
-  "Thailand",
-  "Philippines",
-  "Vietnam",
-  "Myanmar",
-  "Cambodia",
-  "Laos",
-  "Brunei",
+  "Afghanistan",
+  "Albania",
+  "Algeria",
+  "Andorra",
+  "Angola",
+  "Antigua and Barbuda",
+  "Argentina",
+  "Armenia",
   "Australia",
-  "China",
-  "Japan",
-  "South Korea",
-  "India",
-  "United States",
-  "United Kingdom",
-  "Germany",
-  "France",
-  "Netherlands",
-  "Russia",
-  "Saudi Arabia",
-  "UAE",
-  "Canada",
-  "New Zealand",
-  "Taiwan",
-  "Hong Kong",
+  "Austria",
+  "Azerbaijan",
+  "Bahamas",
+  "Bahrain",
   "Bangladesh",
+  "Barbados",
+  "Belarus",
+  "Belgium",
+  "Belize",
+  "Benin",
+  "Bhutan",
+  "Bolivia",
+  "Bosnia and Herzegovina",
+  "Botswana",
+  "Brazil",
+  "Brunei",
+  "Bulgaria",
+  "Burkina Faso",
+  "Burundi",
+  "Cabo Verde",
+  "Cambodia",
+  "Cameroon",
+  "Canada",
+  "Central African Republic",
+  "Chad",
+  "Chile",
+  "China",
+  "Colombia",
+  "Comoros",
+  "Congo (Brazzaville)",
+  "Congo (Kinshasa)",
+  "Costa Rica",
+  "Croatia",
+  "Cuba",
+  "Cyprus",
+  "Czech Republic",
+  "Denmark",
+  "Djibouti",
+  "Dominica",
+  "Dominican Republic",
+  "Ecuador",
+  "Egypt",
+  "El Salvador",
+  "Equatorial Guinea",
+  "Eritrea",
+  "Estonia",
+  "Eswatini",
+  "Ethiopia",
+  "Fiji",
+  "Finland",
+  "France",
+  "Gabon",
+  "Gambia",
+  "Georgia",
+  "Germany",
+  "Ghana",
+  "Greece",
+  "Grenada",
+  "Guatemala",
+  "Guinea",
+  "Guinea-Bissau",
+  "Guyana",
+  "Haiti",
+  "Honduras",
+  "Hungary",
+  "Iceland",
+  "India",
+  "Iran",
+  "Iraq",
+  "Ireland",
+  "Israel",
+  "Italy",
+  "Ivory Coast",
+  "Jamaica",
+  "Japan",
+  "Jordan",
+  "Kazakhstan",
+  "Kenya",
+  "Kiribati",
+  "Kuwait",
+  "Kyrgyzstan",
+  "Laos",
+  "Latvia",
+  "Lebanon",
+  "Lesotho",
+  "Liberia",
+  "Libya",
+  "Liechtenstein",
+  "Lithuania",
+  "Luxembourg",
+  "Madagascar",
+  "Malawi",
+  "Malaysia",
+  "Maldives",
+  "Mali",
+  "Malta",
+  "Marshall Islands",
+  "Mauritania",
+  "Mauritius",
+  "Mexico",
+  "Micronesia",
+  "Moldova",
+  "Monaco",
+  "Mongolia",
+  "Montenegro",
+  "Morocco",
+  "Mozambique",
+  "Myanmar",
+  "Namibia",
+  "Nauru",
+  "Nepal",
+  "Netherlands",
+  "New Zealand",
+  "Nicaragua",
+  "Niger",
+  "Nigeria",
+  "North Korea",
+  "North Macedonia",
+  "Norway",
+  "Oman",
   "Pakistan",
+  "Palau",
+  "Palestine",
+  "Panama",
+  "Papua New Guinea",
+  "Paraguay",
+  "Peru",
+  "Philippines",
+  "Poland",
+  "Portugal",
+  "Qatar",
+  "Romania",
+  "Russia",
+  "Rwanda",
+  "Saint Kitts and Nevis",
+  "Saint Lucia",
+  "Saint Vincent and the Grenadines",
+  "Samoa",
+  "San Marino",
+  "Sao Tome and Principe",
+  "Saudi Arabia",
+  "Senegal",
+  "Serbia",
+  "Seychelles",
+  "Sierra Leone",
+  "Singapore",
+  "Slovakia",
+  "Slovenia",
+  "Solomon Islands",
+  "Somalia",
+  "South Africa",
+  "South Korea",
+  "South Sudan",
+  "Spain",
   "Sri Lanka",
+  "Sudan",
+  "Suriname",
+  "Sweden",
+  "Switzerland",
+  "Syria",
+  "Taiwan",
+  "Tajikistan",
+  "Tanzania",
+  "Thailand",
+  "Timor-Leste",
+  "Togo",
+  "Tonga",
+  "Trinidad and Tobago",
+  "Tunisia",
+  "Turkey",
+  "Turkmenistan",
+  "Tuvalu",
+  "Uganda",
+  "Ukraine",
+  "United Arab Emirates",
+  "United Kingdom",
+  "United States",
+  "Uruguay",
+  "Uzbekistan",
+  "Vanuatu",
+  "Vatican City",
+  "Venezuela",
+  "Vietnam",
+  "Yemen",
+  "Zambia",
+  "Zimbabwe",
   "Other",
 ];
 
@@ -112,6 +302,86 @@ const emptyForm: PatientForm = {
   phone: "",
   country: "",
 };
+
+function CountryCombobox({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [inputValue, setInputValue] = useState(value);
+
+  const filtered = COUNTRIES.filter((c) =>
+    c.toLowerCase().includes(inputValue.toLowerCase()),
+  );
+
+  const handleSelect = (country: string) => {
+    onChange(country);
+    setInputValue(country);
+    setOpen(false);
+  };
+
+  const handleInputChange = (val: string) => {
+    setInputValue(val);
+    onChange(val);
+    setOpen(true);
+  };
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <div className="relative mt-1">
+          <Input
+            data-ocid="pasien.country.input"
+            value={inputValue}
+            onChange={(e) => handleInputChange(e.target.value)}
+            onFocus={() => setOpen(true)}
+            placeholder="Type or search country..."
+            className="pr-8"
+          />
+          <ChevronsUpDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+        </div>
+      </PopoverTrigger>
+      <PopoverContent
+        className="p-0 w-[--radix-popover-trigger-width]"
+        align="start"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
+        <Command shouldFilter={false}>
+          <CommandList>
+            {filtered.length === 0 ? (
+              <CommandEmpty>
+                <span className="text-xs text-muted-foreground">
+                  No match -- "{inputValue}" will be saved as entered
+                </span>
+              </CommandEmpty>
+            ) : (
+              <CommandGroup>
+                {filtered.slice(0, 50).map((c) => (
+                  <CommandItem
+                    key={c}
+                    value={c}
+                    onSelect={() => handleSelect(c)}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        value === c ? "opacity-100" : "opacity-0",
+                      )}
+                    />
+                    {c}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            )}
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+}
 
 export default function PasienPage() {
   const { data: patients, isLoading } = useGetPatients();
@@ -191,7 +461,6 @@ export default function PasienPage() {
           address: form.address,
           phone: form.phone,
         });
-        // Find the newly created patient by fetching fresh data
         if (form.country && actor) {
           try {
             const updated = await queryClient.fetchQuery({
@@ -238,14 +507,36 @@ export default function PasienPage() {
             Manage clinic patient records
           </p>
         </div>
-        <Button
-          data-ocid="pasien.open_modal_button"
-          onClick={openCreate}
-          className="gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          Add Patient
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            data-ocid="patients.export_button"
+            variant="outline"
+            onClick={() => {
+              const rows = (patients ?? []).map((pt) => ({
+                "Patient No": pt.patientNo,
+                Name: pt.name,
+                "Date of Birth": formatDate(pt.dateOfBirth),
+                Gender: String(pt.gender),
+                Address: pt.address,
+                Phone: pt.phone,
+                Country: countryMap[String(pt.id)] || "",
+              }));
+              exportToExcel(rows, "patients");
+            }}
+            className="gap-2"
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            Export
+          </Button>
+          <Button
+            data-ocid="pasien.open_modal_button"
+            onClick={openCreate}
+            className="gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Add Patient
+          </Button>
+        </div>
       </div>
 
       {/* Search */}
@@ -352,7 +643,7 @@ export default function PasienPage() {
                         </td>
                         <td className="px-4 py-3 text-muted-foreground hidden lg:table-cell">
                           {country || (
-                            <span className="text-muted-foreground/50">—</span>
+                            <span className="text-muted-foreground/50">--</span>
                           )}
                         </td>
                         <td className="px-4 py-3">
@@ -474,24 +765,10 @@ export default function PasienPage() {
             </div>
             <div>
               <Label>Country</Label>
-              <Select
+              <CountryCombobox
                 value={form.country}
-                onValueChange={(v) => setForm((f) => ({ ...f, country: v }))}
-              >
-                <SelectTrigger
-                  data-ocid="pasien.country.select"
-                  className="mt-1"
-                >
-                  <SelectValue placeholder="Select country" />
-                </SelectTrigger>
-                <SelectContent>
-                  {COUNTRIES.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                onChange={(v) => setForm((f) => ({ ...f, country: v }))}
+              />
             </div>
           </div>
           <DialogFooter>

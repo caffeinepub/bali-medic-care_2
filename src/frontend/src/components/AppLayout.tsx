@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
+  Ambulance,
+  BarChart2,
   BookOpen,
   ChevronRight,
   Cross,
@@ -29,10 +31,12 @@ const navItems: NavItem[] = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { id: "pasien", label: "Patients", icon: Users },
   { id: "dokter", label: "Doctors", icon: Stethoscope },
+  { id: "emt", label: "EMT", icon: Ambulance },
   { id: "invoice", label: "Invoice", icon: FileText },
   { id: "surat-sakit", label: "Sick Note", icon: Cross },
   { id: "surat-sehat", label: "Health Certificate", icon: Heart },
   { id: "katalog", label: "Service Catalog", icon: BookOpen },
+  { id: "rekap", label: "Recap", icon: BarChart2 },
   { id: "pengaturan", label: "Settings", icon: Settings },
 ];
 

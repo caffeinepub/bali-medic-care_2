@@ -2,10 +2,94 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title></title>
+    <title>Bali Medic Care</title>
+    <meta name="description" content="Bali Medic Care - Clinic Management System" />
+    <meta name="theme-color" content="#1d4ed8" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="BaliMedic" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/assets/generated/pwa-icon-512.dim_512x512.png" />
+    <link rel="preload" href="/assets/fonts/PlusJakartaSans-Variable.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/assets/fonts/PlayfairDisplay-Variable.woff2" as="font" type="font/woff2" crossorigin />
+    <style>
+      *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+      html,body{height:100%;width:100%}
+      body{
+        background-color:#f5f6fb;
+        font-family:system-ui,-apple-system,sans-serif;
+        -webkit-font-smoothing:antialiased;
+      }
+      #root{min-height:100vh}
+      #app-splash{
+        position:fixed;inset:0;
+        display:flex;flex-direction:column;
+        align-items:center;justify-content:center;
+        background:#f5f6fb;
+        z-index:9999;
+        gap:16px;
+        transition:opacity 0.3s ease;
+      }
+      #app-splash.hidden{opacity:0;pointer-events:none}
+      .splash-logo{
+        width:48px;height:48px;
+        background:oklch(0.55 0.22 255);
+        border-radius:12px;
+        display:flex;align-items:center;justify-content:center;
+        box-shadow:0 4px 16px oklch(0.55 0.22 255 / 0.3);
+      }
+      .splash-logo svg{width:24px;height:24px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+      .splash-title{
+        font-size:18px;font-weight:700;
+        color:oklch(0.10 0.030 250);
+        letter-spacing:-0.01em;
+      }
+      .splash-subtitle{
+        font-size:13px;
+        color:oklch(0.40 0.05 240);
+      }
+      .splash-bar{
+        width:160px;height:3px;
+        background:oklch(0.84 0.025 230);
+        border-radius:99px;
+        overflow:hidden;
+      }
+      .splash-bar-fill{
+        height:100%;width:40%;
+        background:oklch(0.55 0.22 255);
+        border-radius:99px;
+        animation:bar-slide 1.2s ease-in-out infinite;
+      }
+      @keyframes bar-slide{
+        0%{transform:translateX(-100%)}
+        50%{transform:translateX(150%)}
+        100%{transform:translateX(400%)}
+      }
+    </style>
   </head>
   <body>
+    <div id="app-splash" aria-label="Loading Bali Medic Care">
+      <div class="splash-logo">
+        <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      </div>
+      <div style="text-align:center">
+        <div class="splash-title">Bali Medic Care</div>
+        <div class="splash-subtitle">Loading system...</div>
+      </div>
+      <div class="splash-bar"><div class="splash-bar-fill"></div></div>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js').then(function(registration) {
+            console.log('SW registered:', registration.scope);
+          }).catch(function(error) {
+            console.log('SW registration failed:', error);
+          });
+        });
+      }
+    </script>
   </body>
 </html>

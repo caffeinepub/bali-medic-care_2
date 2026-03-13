@@ -28,7 +28,8 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Printer, Trash2 } from "lucide-react";
+import { exportToExcel } from "@/lib/exportExcel";
+import { FileSpreadsheet, Plus, Printer, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -134,14 +135,44 @@ export default function SuratSehatPage({ onPrint }: Props) {
             Manage patient health certificates
           </p>
         </div>
-        <Button
-          data-ocid="surat-sehat.open_modal_button"
-          onClick={openCreate}
-          className="gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          New Certificate
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            data-ocid="healthy-certificates.export_button"
+            variant="outline"
+            onClick={() => {
+              const rows = (certs ?? []).map((c) => {
+                const patient = patients?.find((p) => p.id === c.patientId);
+                const doctor = doctors?.find((dd) => dd.id === c.doctorId);
+                return {
+                  Patient: patient?.name ?? String(c.patientId),
+                  Doctor: doctor?.name ?? String(c.doctorId),
+                  Purpose: c.purpose,
+                  "Issued Date": new Date(
+                    Number(c.issuedDate / BigInt(1_000_000)),
+                  ).toLocaleDateString(),
+                  "Blood Pressure": c.bloodPressure,
+                  Pulse: Number(c.pulse),
+                  "Weight (kg)": Number(c.weight),
+                  "Height (cm)": Number(c.height),
+                  Notes: c.notes,
+                };
+              });
+              exportToExcel(rows, "healthy-certificates");
+            }}
+            className="gap-2"
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            Export
+          </Button>
+          <Button
+            data-ocid="surat-sehat.open_modal_button"
+            onClick={openCreate}
+            className="gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            New Certificate
+          </Button>
+        </div>
       </div>
 
       <Card className="shadow-card">

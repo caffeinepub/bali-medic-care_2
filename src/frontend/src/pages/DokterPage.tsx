@@ -20,7 +20,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Pencil, Plus, Stethoscope, Trash2 } from "lucide-react";
+import { exportToExcel } from "@/lib/exportExcel";
+import {
+  FileSpreadsheet,
+  Pencil,
+  Plus,
+  Stethoscope,
+  Trash2,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -105,14 +112,32 @@ export default function DokterPage() {
             Manage clinic doctor records
           </p>
         </div>
-        <Button
-          data-ocid="dokter.open_modal_button"
-          onClick={openCreate}
-          className="gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          Add Doctor
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            data-ocid="doctors.export_button"
+            variant="outline"
+            onClick={() => {
+              const rows = (doctors ?? []).map((doc) => ({
+                Name: doc.name,
+                Specialization: doc.specialization,
+                Phone: doc.phone,
+              }));
+              exportToExcel(rows, "doctors");
+            }}
+            className="gap-2"
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            Export
+          </Button>
+          <Button
+            data-ocid="dokter.open_modal_button"
+            onClick={openCreate}
+            className="gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Add Doctor
+          </Button>
+        </div>
       </div>
 
       <Card className="shadow-card">
